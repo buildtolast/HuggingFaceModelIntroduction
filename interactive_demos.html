@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hugging Face Models - Interactive Demos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        nav {
+            background: white;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+        }
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        nav button {
+            background: none;
+            border: none;
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 1rem;
+        }
+        nav button:hover {
+            background: #f0f0f0;
+        }
+        nav button.active {
+            background: #667eea;
+            color: white;
+        }
+        section {
+            background: white;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: none;
+        }
+        section.active {
+            display: block;
+        }
+        h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        h3 {
+            color: #764ba2;
+            font-size: 1.3rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .demo-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #667eea;
+        }
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #eee;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        .output-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 6px;
+            border-left: 4px solid #4caf50;
+            margin-top: 1.5rem;
+            display: none;
+        }
+        .output-section.show {
+            display: block;
+        }
+        .output-title {
+            color: #4caf50;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .output-content {
+            background: white;
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .parameter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .param-input {
+            display: flex;
+            flex-direction: column;
+        }
+        .param-input label {
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+        .param-input input {
+            padding: 0.5rem;
+        }
+        .slider-container {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .slider-container input[type="range"] {
+            flex: 1;
+        }
+        .slider-value {
+            background: #f0f0f0;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            min-width: 60px;
+            text-align: center;
+            font-weight: 600;
+            color: #667eea;
+        }
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        .note {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ff9800;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .example-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            border: 1px solid #eee;
+        }
+        .example-card h4 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        .example-card p {
+            font-size: 0.95rem;
+            color: #666;
+        }
+        footer {
+            background: #333;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .comparison-table th,
+        .comparison-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .comparison-table th {
+            background: #f0f0f0;
+            font-weight: 600;
+            color: #667eea;
+        }
+        @media (max-width: 768px) {
+            .parameter-grid {
+                grid-template-columns: 1fr;
+            }
+            .button-group {
+                flex-direction: column;
+            }
+            header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎮 Hugging Face Models - Interactive Demos</h1>
+        <p>Try different models and parameters in real-time</p>
+    </header>
+
+    <div class="container">
+        <nav>
+            <ul>
+                <li><button class="nav-btn active" onclick="switchTab('text-generation')">Text Generation</button></li>
+                <li><button class="nav-btn" onclick="switchTab('embeddings')">Embeddings</button></li>
+                <li><button class="nav-btn" onclick="switchTab('classification')">Classification</button></li>
+                <li><button class="nav-btn" onclick="switchTab('parameter-tuning')">Parameter Tuning</button></li>
+                <li><button class="nav-btn" onclick="switchTab('quantization')">Quantization Effects</button></li>
+                <li><button class="nav-btn" onclick="switchTab('training-simulation')">Training Simulation</button></li>
+            </ul>
+        </nav>
+
+        <!-- TEXT GENERATION DEMO -->
+        <section id="text-generation" class="active">
+            <h2>1. Text Generation Demo</h2>
+
+            <div class="note">
+                <strong>How it works:</strong> Enter a prompt and adjust model parameters to see how they affect output. These are simulated examples showing what real responses would look like.
+            </div>
+
+            <div class="demo-card">
+                <h3>Model Selection</h3>
+                <div class="input-group">
+                    <label for="gen-model">Choose a Model:</label>
+                    <select id="gen-model">
+                        <option value="llama-70b">Llama 3.3 70B (Highest quality)</option>
+                        <option value="qwen-7b">Qwen 2.5 7B (Balanced)</option>
+                        <option value="mistral-7b">Mistral 7B (Fastest)</option>
+                    </select>
+                </div>
+
+                <h3>Your Prompt</h3>
+                <div class="input-group">
+                    <label for="prompt">Enter your text:</label>
+                    <textarea id="prompt" placeholder="Example: Explain machine learning in simple terms..."></textarea>
+                </div>
+
+                <h3>Generation Parameters</h3>
+                <div class="parameter-grid">
+                    <div class="param-input">
+                        <label for="temperature">Temperature:</label>
+                        <div class="slider-container">
+                            <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7">
+                            <span class="slider-value"><span id="tempValue">0.7</span></span>
+                        </div>
+                        <small style="color: #666; margin-top: 0.25rem;">0.0 = Deterministic, 1.0 = Balanced, 2.0 = Creative</small>
+                    </div>
+
+                    <div class="param-input">
+                        <label for="top-p">Top-P (nucleus):</label>
+                        <div class="slider-container">
+                            <input type="range" id="top-p" min="0.1" max="1.0" step="0.05" value="0.9">
+                            <span class="slider-value"><span id="topPValue">0.9</span></span>
+                        </div>
+                        <small style="color: #666; margin-top: 0.25rem;">0.9 = Standard, 0.95 = More creative</small>
+                    </div>
+
+                    <div class="param-input">
+                        <label for="max-tokens">Max Tokens:</label>
+                        <input type="number" id="max-tokens" min="10" max="2000" value="200">
+                        <small style="color: #666; margin-top: 0.25rem;">Output length (~4 chars per token)</small>
+                    </div>
+
+                    <div class="param-input">
+                        <label for="freq-penalty">Frequency Penalty:</label>
+                        <div class="slider-container">
+                            <input type="range" id="freq-penalty" min="0" max="2" step="0.1" value="0.1">
+                            <span class="slider-value"><span id="freqValue">0.1</span></span>
+                        </div>
+                        <small style="color: #666; margin-top: 0.25rem;">0.0 = Allow repeats, 0.5+ = Avoid repeats</small>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="generateText()">Generate Text</button>
+                    <button class="btn-secondary" onclick="resetGeneration()">Reset</button>
+                </div>
+
+                <div class="output-section" id="genOutput">
+                    <div class="output-title">📝 Generated Output:</div>
+                    <div class="output-content" id="genContent"></div>
+                    <div style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
+                        <strong>Stats:</strong> Tokens: <span id="tokenCount">0</span> | Latency: <span id="latencyEstimate">0</span>ms | Temperature Effect: <span id="tempEffect">Balanced</span>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2rem;">Parameter Impact Examples</h3>
+                <div class="example-grid">
+                    <div class="example-card">
+                        <h4>Low Temperature (0.1)</h4>
+                        <p>Best for: Code generation, math, factual answers</p>
+                        <p><em>Output becomes deterministic and conservative</em></p>
+                    </div>
+                    <div class="example-card">
+                        <h4>High Temperature (1.5+)</h4>
+                        <p>Best for: Creative writing, brainstorming</p>
+                        <p><em>Output becomes diverse and unpredictable</em></p>
+                    </div>
+                    <div class="example-card">
+                        <h4>Top-P: 0.9</h4>
+                        <p>Industry standard. Removes unlikely tokens</p>
+                        <p><em>Adaptive to token confidence</em></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- EMBEDDINGS DEMO -->
+        <section id="embeddings">
+            <h2>2. Embeddings Demo</h2>
+
+            <div class="note">
+                <strong>What are embeddings?</strong> Convert text into vectors for semantic search, clustering, and similarity tasks.
+            </div>
+
+            <div class="demo-card">
+                <h3>Semantic Similarity Checker</h3>
+
+                <div class="input-group">
+                    <label for="text1">Text 1:</label>
+                    <input type="text" id="text1" placeholder="The cat is sitting on the mat" value="The cat is sitting on the mat">
+                </div>
+
+                <div class="input-group">
+                    <label for="text2">Text 2:</label>
+                    <input type="text" id="text2" placeholder="A feline rests on the rug" value="A feline rests on the rug">
+                </div>
+
+                <div class="input-group">
+                    <label for="embedding-model">Embedding Model:</label>
+                    <select id="embedding-model">
+                        <option value="minilm">all-MiniLM-L6-v2 (Fast, 207M downloads)</option>
+                        <option value="mpnet">all-mpnet-base-v2 (Quality)</option>
+                        <option value="e5">multilingual-e5-large (100+ languages)</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="computeSimilarity()">Compute Similarity</button>
+                </div>
+
+                <div class="output-section" id="similarityOutput">
+                    <div class="output-title">📊 Similarity Result:</div>
+                    <div id="similarityContent" style="padding: 1rem;">
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Cosine Similarity:</strong> <span id="similarityScore" style="font-size: 1.3rem; color: #667eea; font-weight: 600;">0.87</span> (0.0 = different, 1.0 = identical)
+                        </div>
+                        <div style="background: white; padding: 0.75rem; border-radius: 4px; margin: 0.5rem 0;">
+                            <strong>Interpretation:</strong> <span id="similarityInterpretation">Highly similar - same semantic meaning</span>
+                        </div>
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd;">
+                            <strong>Embedding Details:</strong>
+                            <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
+                                <p>Text 1 Vector Dims: <span id="dims1">384</span></p>
+                                <p>Text 2 Vector Dims: <span id="dims2">384</span></p>
+                                <p>Computation Time: <span id="embTime">125ms</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2rem;">Embedding Models Comparison</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Dimensions</th>
+                            <th>Speed</th>
+                            <th>Quality</th>
+                            <th>Downloads/Month</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>all-MiniLM-L6-v2</strong></td>
+                            <td>384</td>
+                            <td>⚡⚡⚡⚡⚡</td>
+                            <td>⭐⭐⭐⭐</td>
+                            <td>207M</td>
+                        </tr>
+                        <tr>
+                            <td><strong>all-mpnet-base-v2</strong></td>
+                            <td>768</td>
+                            <td>⚡⚡⚡⚡</td>
+                            <td>⭐⭐⭐⭐⭐</td>
+                            <td>28M</td>
+                        </tr>
+                        <tr>
+                            <td><strong>multilingual-e5-large</strong></td>
+                            <td>1024</td>
+                            <td>⚡⚡⚡</td>
+                            <td>⭐⭐⭐⭐⭐</td>
+                            <td>5.2M</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin-top: 2rem;">Use Cases for Embeddings</h3>
+                <div class="example-grid">
+                    <div class="example-card">
+                        <h4>Semantic Search</h4>
+                        <p>Find similar documents or answers without exact keyword matching</p>
+                    </div>
+                    <div class="example-card">
+                        <h4>RAG (Retrieval-Augmented Generation)</h4>
+                        <p>Retrieve relevant context before generating answers</p>
+                    </div>
+                    <div class="example-card">
+                        <h4>Clustering</h4>
+                        <p>Group similar texts or documents together</p>
+                    </div>
+                    <div class="example-card">
+                        <h4>Recommendation Systems</h4>
+                        <p>Find similar products or content</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CLASSIFICATION DEMO -->
+        <section id="classification">
+            <h2>3. Text Classification Demo</h2>
+
+            <div class="note">
+                <strong>Zero-shot classification:</strong> Classify text into categories without training on those exact categories.
+            </div>
+
+            <div class="demo-card">
+                <div class="input-group">
+                    <label for="classify-text">Text to Classify:</label>
+                    <textarea id="classify-text" placeholder="Enter text here...">I love this product! It works perfectly and arrived quickly.</textarea>
+                </div>
+
+                <div class="input-group">
+                    <label for="classify-labels">Categories (comma-separated):</label>
+                    <input type="text" id="classify-labels" value="positive sentiment, negative sentiment, neutral sentiment, product review, complaint">
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="classifyText()">Classify</button>
+                </div>
+
+                <div class="output-section" id="classifyOutput">
+                    <div class="output-title">🏷️ Classification Results:</div>
+                    <div id="classifyContent"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PARAMETER TUNING DEMO -->
+        <section id="parameter-tuning">
+            <h2>4. Parameter Tuning Guide</h2>
+
+            <div class="demo-card">
+                <h3>Temperature Effects</h3>
+                <p>See how temperature affects the same prompt across different models:</p>
+
+                <div class="input-group">
+                    <label for="tuning-prompt">Your Prompt:</label>
+                    <textarea id="tuning-prompt" placeholder="Once upon a time..."></textarea>
+                </div>
+
+                <div class="parameter-grid">
+                    <div class="param-input">
+                        <label for="tuning-temp">Temperature:</label>
+                        <div class="slider-container">
+                            <input type="range" id="tuning-temp" min="0" max="2" step="0.1" value="0.7" onchange="updateTuningPreview()">
+                            <span class="slider-value"><span id="tuningTempValue">0.7</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="demonstrateTemperature()">Show Temperature Effect</button>
+                </div>
+
+                <div class="output-section" id="tuningOutput">
+                    <div class="output-title">🎚️ Temperature Comparison:</div>
+                    <div style="padding: 1rem;">
+                        <div style="margin-bottom: 1.5rem;">
+                            <h4 style="color: #333; margin-bottom: 0.5rem;">Temperature: 0.2 (Deterministic)</h4>
+                            <div style="background: white; padding: 1rem; border-radius: 4px;">
+                                <span id="output02"></span>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <h4 style="color: #333; margin-bottom: 0.5rem;">Temperature: 0.7 (Balanced - Current)</h4>
+                            <div style="background: white; padding: 1rem; border-radius: 4px;">
+                                <span id="output07"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="color: #333; margin-bottom: 0.5rem;">Temperature: 1.5 (Creative)</h4>
+                            <div style="background: white; padding: 1rem; border-radius: 4px;">
+                                <span id="output15"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2rem;">Parameter Quick Reference</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Range</th>
+                            <th>Use When</th>
+                            <th>Affects</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Temperature</strong></td>
+                            <td>0.0 - 2.0</td>
+                            <td>Always applicable</td>
+                            <td>Randomness / creativity</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Top-P</strong></td>
+                            <td>0.1 - 1.0</td>
+                            <td>With temperature</td>
+                            <td>Adaptive token filtering</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Frequency Penalty</strong></td>
+                            <td>0.0 - 2.0</td>
+                            <td>Avoid repetition</td>
+                            <td>Repetitive tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Max Tokens</strong></td>
+                            <td>1 - context window</td>
+                            <td>Control length</td>
+                            <td>Output length</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- QUANTIZATION DEMO -->
+        <section id="quantization">
+            <h2>5. Quantization Effects</h2>
+
+            <div class="note">
+                <strong>Quantization:</strong> Reduce model size (75% VRAM savings) with minimal quality loss (5-10%)
+            </div>
+
+            <div class="demo-card">
+                <h3>Quality vs Speed Comparison</h3>
+
+                <div class="input-group">
+                    <label for="quant-prompt">Test Prompt:</label>
+                    <textarea id="quant-prompt" placeholder="What is machine learning?"></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="demonstrateQuantization()">Compare Quantizations</button>
+                </div>
+
+                <div class="output-section" id="quantOutput">
+                    <div class="output-title">⚙️ Quantization Comparison:</div>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Format</th>
+                                <th>VRAM (7B)</th>
+                                <th>Speed</th>
+                                <th>Quality</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>FP32</strong></td>
+                                <td>28GB</td>
+                                <td>1×</td>
+                                <td>100%</td>
+                                <td>Research baseline</td>
+                            </tr>
+                            <tr>
+                                <td><strong>FP16</strong></td>
+                                <td>14GB</td>
+                                <td>2×</td>
+                                <td>99.5%</td>
+                                <td>GPU default</td>
+                            </tr>
+                            <tr>
+                                <td><strong>INT8</strong></td>
+                                <td>7GB</td>
+                                <td>3×</td>
+                                <td>98%</td>
+                                <td>Good balance</td>
+                            </tr>
+                            <tr style="background: #fffacd;">
+                                <td><strong>GPTQ 4-bit</strong></td>
+                                <td>3.5GB</td>
+                                <td>2.6×</td>
+                                <td>95-96%</td>
+                                <td>Mobile</td>
+                            </tr>
+                            <tr style="background: #fffacd;">
+                                <td><strong>AWQ 4-bit</strong> ⭐</td>
+                                <td>3.5GB</td>
+                                <td>10.9×</td>
+                                <td>96-97%</td>
+                                <td>Best 4-bit</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4 style="margin-top: 2rem; color: #764ba2;">Memory Savings Breakdown:</h4>
+                    <div style="margin-top: 1rem;">
+                        <p><strong>Llama 3.3 70B Model:</strong></p>
+                        <p>FP32: 280GB → FP16: 140GB → INT8: 70GB → 4-bit: 35GB</p>
+                        <p><span style="color: #4caf50; font-weight: 600;">87.5% memory savings with 4-bit quantization!</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TRAINING SIMULATION -->
+        <section id="training-simulation">
+            <h2>6. Training Methods Simulation</h2>
+
+            <div class="note">
+                <strong>Compare different training approaches:</strong> Full fine-tuning, LoRA, and QLoRA
+            </div>
+
+            <div class="demo-card">
+                <h3>Training Method Comparison</h3>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Trainable Params</th>
+                            <th>VRAM (7B)</th>
+                            <th>Training Time</th>
+                            <th>Quality</th>
+                            <th>Best For</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Full Fine-tuning</strong></td>
+                            <td>7B (100%)</td>
+                            <td>60GB+</td>
+                            <td>24-72 hours (8 GPUs)</td>
+                            <td>⭐⭐⭐⭐⭐</td>
+                            <td>Research, maximum quality</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LoRA</strong></td>
+                            <td>1.6M (0.02%)</td>
+                            <td>24GB</td>
+                            <td>2-6 hours (1 GPU)</td>
+                            <td>⭐⭐⭐⭐</td>
+                            <td>Production, good balance</td>
+                        </tr>
+                        <tr style="background: #e8f5e9;">
+                            <td><strong>QLoRA</strong> ⭐</td>
+                            <td>1.6M (0.02%)</td>
+                            <td>8GB</td>
+                            <td>3-8 hours (1 GPU)</td>
+                            <td>⭐⭐⭐⭐</td>
+                            <td>Consumer GPU, affordable</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin-top: 2rem;">Training Flow Example (QLoRA)</h3>
+                <div class="code-block">
+# 1. Load base model (quantized)
+model = load_quantized_model("meta-llama/Llama-2-7b")
+
+# 2. Add LoRA adapters (1.6M params)
+lora_config = LoraConfig(r=8, lora_alpha=16, target_modules=["q_proj", "v_proj"])
+
+# 3. Setup training
+trainer = SFTTrainer(
+    model=model,
+    train_dataset=dataset,
+    peft_config=lora_config,
+    max_seq_length=512,
+    epochs=3,
+    per_device_train_batch_size=4,
+)
+
+# 4. Train
+trainer.train()
+
+# 5. Save adapters only (light weight)
+model.save_pretrained("my-finetuned-model")  # ~50MB instead of 14GB!
+                </div>
+
+                <h3>Why QLoRA is Popular in 2026</h3>
+                <div class="example-grid">
+                    <div class="example-card">
+                        <h4>✅ Advantages</h4>
+                        <p>• 75% VRAM savings</p>
+                        <p>• Works on RTX 4090 (24GB)</p>
+                        <p>• Fast training (3-8 hours)</p>
+                        <p>• Adapters are portable</p>
+                    </div>
+                    <div class="example-card">
+                        <h4>⚠️ Trade-offs</h4>
+                        <p>• Slightly slower training</p>
+                        <p>• Quality ≈ 95% of full FT</p>
+                        <p>• Limited architectural changes</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Hugging Face Models Interactive Demos</p>
+        <p>Navigate between demos above to explore different concepts</p>
+    </footer>
+
+    <script>
+        // Tab navigation
+        function switchTab(tabName) {
+            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // Slider updates
+        document.getElementById('temperature').addEventListener('input', (e) => {
+            document.getElementById('tempValue').textContent = e.target.value;
+        });
+        document.getElementById('top-p').addEventListener('input', (e) => {
+            document.getElementById('topPValue').textContent = e.target.value;
+        });
+        document.getElementById('freq-penalty').addEventListener('input', (e) => {
+            document.getElementById('freqValue').textContent = e.target.value;
+        });
+
+        // Text generation
+        function generateText() {
+            const prompt = document.getElementById('prompt').value;
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const topP = parseFloat(document.getElementById('top-p').value);
+            const maxTokens = parseInt(document.getElementById('max-tokens').value);
+            const model = document.getElementById('gen-model').value;
+
+            if (!prompt) {
+                alert('Please enter a prompt');
+                return;
+            }
+
+            let output = "Simulated output based on your parameters:\n\n";
+            let tempEffect = '';
+
+            if (temperature < 0.3) {
+                output += "Machine learning is a subset of artificial intelligence that focuses on enabling computer systems to learn and improve from experience without being explicitly programmed. The process involves algorithms that analyze data patterns and make predictions or decisions based on that analysis.";
+                tempEffect = "Very Deterministic";
+            } else if (temperature < 0.8) {
+                output += "Machine learning represents a fascinating branch of artificial intelligence where systems automatically improve through experience. Rather than following pre-defined rules, ML algorithms discover patterns in data and use those insights to make informed predictions or classifications. This approach powers modern applications from recommendation systems to image recognition.";
+                tempEffect = "Balanced";
+            } else {
+                output += "Imagine teaching a computer to learn like humans do! Machine learning is this amazing field where algorithms become smarter by analyzing examples. Instead of programmers writing every single instruction, the system figures out patterns by itself. It's like a student learning from textbooks - the algorithm reads data and gets better at recognizing patterns, making predictions more accurate over time...";
+                tempEffect = "Creative";
+            }
+
+            const estimatedTokens = Math.ceil(output.length / 4);
+            const latency = estimatedTokens * (model === 'mistral-7b' ? 30 : model === 'qwen-7b' ? 50 : 100);
+
+            document.getElementById('genContent').textContent = output;
+            document.getElementById('tokenCount').textContent = estimatedTokens;
+            document.getElementById('latencyEstimate').textContent = latency;
+            document.getElementById('tempEffect').textContent = tempEffect;
+            document.getElementById('genOutput').classList.add('show');
+        }
+
+        function resetGeneration() {
+            document.getElementById('prompt').value = '';
+            document.getElementById('genOutput').classList.remove('show');
+        }
+
+        // Embeddings
+        function computeSimilarity() {
+            const text1 = document.getElementById('text1').value;
+            const text2 = document.getElementById('text2').value;
+            const model = document.getElementById('embedding-model').value;
+
+            if (!text1 || !text2) {
+                alert('Please enter both texts');
+                return;
+            }
+
+            let similarity = 0.87;
+            let interpretation = "Highly similar - same semantic meaning";
+
+            const similarity_score = Math.abs(text1.length - text2.length) / Math.max(text1.length, text2.length);
+            similarity = Math.max(0.3, 1 - similarity_score * 0.5);
+
+            if (similarity > 0.8) interpretation = "Highly similar - equivalent meaning";
+            else if (similarity > 0.6) interpretation = "Similar - related concepts";
+            else if (similarity > 0.4) interpretation = "Somewhat similar - some overlap";
+            else interpretation = "Different - distinct meanings";
+
+            const dims = model === 'e5' ? 1024 : model === 'mpnet' ? 768 : 384;
+
+            document.getElementById('similarityScore').textContent = similarity.toFixed(2);
+            document.getElementById('similarityInterpretation').textContent = interpretation;
+            document.getElementById('dims1').textContent = dims;
+            document.getElementById('dims2').textContent = dims;
+            document.getElementById('embTime').textContent = (Math.random() * 100 + 50).toFixed(0);
+            document.getElementById('similarityOutput').classList.add('show');
+        }
+
+        // Classification
+        function classifyText() {
+            const text = document.getElementById('classify-text').value;
+            const labels = document.getElementById('classify-labels').value.split(',').map(l => l.trim());
+
+            let html = '<div style="padding: 1rem;">';
+            labels.forEach((label, i) => {
+                const score = (Math.random() * 0.3 + (i === 0 ? 0.7 : 0.2)).toFixed(2);
+                html += `
+                    <div style="margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                            <strong>${label}</strong>
+                            <span style="color: #667eea; font-weight: 600;">${score}</span>
+                        </div>
+                        <div style="background: #f0f0f0; height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; width: ${score * 100}%;"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            document.getElementById('classifyContent').innerHTML = html;
+            document.getElementById('classifyOutput').classList.add('show');
+        }
+
+        // Temperature demonstration
+        function demonstrateTemperature() {
+            const prompt = document.getElementById('tuning-prompt').value || "Once upon a time";
+
+            document.getElementById('output02').textContent = prompt + " there was a kingdom in a land far away. The king ruled wisely over his people. Every day was peaceful and prosperous.";
+            document.getElementById('output07').textContent = prompt + " there lived a mysterious wizard in an ancient tower. The wizard possessed great magical powers and helped those in need. Tales of magic echoed through the realm.";
+            document.getElementById('output15').textContent = prompt + " the butterflies forgot how to dance, so the moon became a purple elephant wearing tap shoes. Reality swirled with unexpected wonders and the impossible became... possible?";
+
+            document.getElementById('tuningOutput').classList.add('show');
+        }
+
+        // Quantization demo
+        function demonstrateQuantization() {
+            document.getElementById('quantOutput').classList.add('show');
+        }
+    </script>
+</body>
+</html>

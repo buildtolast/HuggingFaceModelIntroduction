@@ -1,0 +1,44 @@
+Model Name,Category,Parameters,Context Window,VRAM (4-bit),VRAM (8-bit),Best For,Hub Link,License
+Llama 3.3 70B Instruct,LLM,70B,128k,40GB,75GB,High-quality chat / agents,https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct,Llama 3.3
+DeepSeek-R1,LLM,671B,128k,370GB+,740GB+,Complex reasoning,https://huggingface.co/deepseek-ai/DeepSeek-R1,MIT
+DeepSeek-V3,LLM,671B / 37B active,128k,90GB,180GB,Efficient reasoning,https://huggingface.co/deepseek-ai/DeepSeek-V3,DeepSeek
+Qwen3,LLM,235B / 22B active,128k,125GB+,250GB+,Multilingual / long-context,https://huggingface.co/Qwen/Qwen3,Apache-2.0
+Mixtral 8x22B,LLM,141B / 44B active,64k,73GB,150GB,Reasoning,https://huggingface.co/mistralai/Mixtral-8x22B,Apache-2.0
+Gemma 3 4B,LLM,4B,32k,2GB,4GB,Mobile / edge deployment,https://huggingface.co/google/gemma-3-4b-it,Gemma
+Qwen2.5 7B,LLM,7B,32k,4GB,8GB,Mobile friendly,https://huggingface.co/Qwen/Qwen2.5-7B,Apache-2.0
+Llama 3.2 1B,LLM,1B,8k,1GB,2GB,Ultra-lightweight,https://huggingface.co/meta-llama/Llama-3.2-1B,Llama 3.2
+all-MiniLM-L6-v2,Embeddings,22.7M,256 tokens,<1GB,<1GB,Semantic search / similarity,https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2,Apache-2.0
+all-mpnet-base-v2,Embeddings,110M,384 tokens,<1GB,<1GB,High-quality embeddings,https://huggingface.co/sentence-transformers/all-mpnet-base-v2,Apache-2.0
+multilingual-e5-large,Embeddings,560M,512 tokens,1GB,2GB,100+ languages support,https://huggingface.co/intfloat/multilingual-e5-large,MIT
+sentence-t5-large,Embeddings,330M,256 tokens,<1GB,1GB,Sentence similarity,https://huggingface.co/sentence-transformers/sentence-t5-large,Apache-2.0
+google/vit-base-patch16-224,Vision,86M,1 image,<1GB,<1GB,Image classification,https://huggingface.co/google/vit-base-patch16-224,Apache-2.0
+facebook/convnext-tiny-224,Vision,28.6M,1 image,<1GB,<1GB,Efficient classification,https://huggingface.co/facebook/convnext-tiny-224,Apache-2.0
+timm/mvitv2_large.fb_in1k,Vision,218M,1 image,<1GB,1GB,High-accuracy classification,https://huggingface.co/timm/mvitv2_large.fb_in1k,Apache-2.0
+openai/clip-vit-large-patch14,Vision,428M,context + image,1GB,2GB,Zero-shot image classification,https://huggingface.co/openai/clip-vit-large-patch14,MIT
+google/siglip-so400m-patch14,Vision,400M,context + image,1GB,2GB,Improved CLIP,https://huggingface.co/google/siglip-so400m-patch14,Apache-2.0
+openai/whisper-large-v3,Audio,1.55B,auto,<1GB,2GB,Speech recognition (96 languages),https://huggingface.co/openai/whisper-large-v3,MIT
+openai/whisper-small,Audio,244M,auto,<1GB,<1GB,Lightweight ASR,https://huggingface.co/openai/whisper-small,MIT
+facebook/mms-1b-all,Audio,1B,auto,<1GB,2GB,1107 languages ASR,https://huggingface.co/facebook/mms-1b-all,Apache-2.0
+hexgrad/Kokoro-82M,Audio,82M,1 text,<1GB,<1GB,Fast TTS,https://huggingface.co/hexgrad/Kokoro-82M,Apache-2.0
+meta-llama/Llama-3.2-11B-Vision,Multimodal,11B,128k,6GB,12GB,Vision-language chat,https://huggingface.co/meta-llama/Llama-3.2-11B-Vision,Llama 3.2
+meta-llama/Llama-3.2-90B-Vision,Multimodal,90B,128k,50GB,95GB,Advanced vision-language,https://huggingface.co/meta-llama/Llama-3.2-90B-Vision,Llama 3.2
+HuggingfaceTB/SmolVLM-500M-Instruct,Multimodal,500M,4k,<1GB,1GB,Mobile vision-language,https://huggingface.co/HuggingfaceTB/SmolVLM-500M-Instruct,Apache-2.0
+Qwen/Qwen3-VL-8B,Multimodal,8B,32k,4GB,8GB,Multimodal reasoning,https://huggingface.co/Qwen/Qwen3-VL-8B,Apache-2.0
+llava-hf/llava-1.5-7b-hf,Multimodal,7B,4k,4GB,8GB,Instruction-following vision,https://huggingface.co/llava-hf/llava-1.5-7b-hf,Apache-2.0
+google/paligemma2,Multimodal,3B-28B,varies,2-20GB,4-40GB,Vision-language tasks,https://huggingface.co/google/paligemma2,Apache-2.0
+mistralai/Pixtral-12B,Multimodal,12B,4k,7GB,14GB,Multimodal reasoning,https://huggingface.co/mistralai/Pixtral-12B,Apache-2.0
+microsoft/Phi-4-vision,Multimodal,15B,8k,8GB,16GB,Visual reasoning,https://huggingface.co/microsoft/Phi-4-vision,MIT
+deepseek-ai/deepseek-vl2,Multimodal,8B-27B,4k,5-15GB,10-30GB,Visual understanding,https://huggingface.co/deepseek-ai/deepseek-vl2,MIT
+google/gemma-3-4b-vision,Multimodal,4B,32k,2GB,4GB,Mobile vision-language,https://huggingface.co/google/gemma-3-4b-vision,Gemma
+black-forest-labs/FLUX.1-dev,Image Generation,12B,1 prompt,8GB,16GB,High-quality generation,https://huggingface.co/black-forest-labs/FLUX.1-dev,FLUX.1 Non-Commercial
+stabilityai/stable-diffusion-3.5,Image Generation,8B,1 prompt,4GB,8GB,Production image generation,https://huggingface.co/stabilityai/stable-diffusion-3.5,OpenRAIL
+stabilityai/stable-diffusion-xl-base-1.0,Image Generation,2.6B,1 prompt,2GB,4GB,Quality/speed balance,https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0,OpenRAIL++
+deepseek-ai/deepseek-coder-33b,Code Generation,33B,4k,18GB,36GB,Code completion,https://huggingface.co/deepseek-ai/deepseek-coder-33b,MIT
+mistralai/Codestral-22B,Code Generation,22B,8k,12GB,24GB,Production code generation,https://huggingface.co/mistralai/Codestral-22B,Mistral Community
+bigcode/starcoder2-15b,Code Generation,15B,16k,8GB,16GB,Code and text,https://huggingface.co/bigcode/starcoder2-15b,BigCode OpenRAIL
+facebook/m2m100_418M,Translation,418M,512 tokens,<1GB,1GB,100 language translation,https://huggingface.co/facebook/m2m100_418M,CC-BY-NC-4.0
+facebook/bart-large-cnn,Summarization,400M,1024 tokens,<1GB,1GB,Document summarization,https://huggingface.co/facebook/bart-large-cnn,Apache-2.0
+dslim/bert-large-NER,NER,340M,512 tokens,<1GB,1GB,Named entity recognition,https://huggingface.co/dslim/bert-large-NER,Apache-2.0
+MoritzLaurer/deberta-v3-base-mnli,Zero-Shot,184M,512 tokens,<1GB,<1GB,Zero-shot classification,https://huggingface.co/MoritzLaurer/DeBERTa-v3-base-mnli,Apache-2.0
+baidu/Qianfan-OCR,Document AI,5B,varies,2GB,4GB,Document OCR,https://huggingface.co/baidu/Qianfan-OCR,Apache-2.0
+lerobot/pi0,Robotics,224M,varies,1GB,2GB,Robot manipulation,https://huggingface.co/lerobot/pi0,Apache-2.0

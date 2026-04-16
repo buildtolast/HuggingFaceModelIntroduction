@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hugging Face Models Guide - Complete Resource Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+            animation: slideDown 0.6s ease-out;
+        }
+        header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        header p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.85;
+            margin-top: 1rem;
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .breadcrumb {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: rgba(255,255,255,0.9);
+            font-size: 0.95rem;
+        }
+        .learning-path {
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .learning-path h2 {
+            color: #667eea;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .path-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .step {
+            background: linear-gradient(135deg, #f0f4ff 0%, #f8f1ff 100%);
+            border-left: 4px solid #667eea;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            line-height: 40px;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .step h3 {
+            color: #764ba2;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .step p {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .module-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: fadeIn 0.6s ease-out;
+        }
+        .module-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .module-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .module-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        .module-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        .module-subtitle {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        .module-content {
+            padding: 2rem;
+        }
+        .module-description {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        .module-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+        .module-features li {
+            color: #333;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .module-features li:last-child {
+            border-bottom: none;
+        }
+        .module-features li:before {
+            content: "✓ ";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        .module-level {
+            display: inline-block;
+            background: #f0f0f0;
+            color: #667eea;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .level-beginner {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .level-intermediate {
+            background: #fff3e0;
+            color: #e65100;
+        }
+        .level-advanced {
+            background: #f3e5f5;
+            color: #6a1b9a;
+        }
+        .module-cta {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .module-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .quick-stats {
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            color: white;
+            text-align: center;
+        }
+        .stat-box {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        .faq-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .faq-section h2 {
+            color: #667eea;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .faq-item {
+            border-bottom: 1px solid #eee;
+            padding: 1.5rem 0;
+        }
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+        .faq-question {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .faq-answer {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .recommended-path {
+            background: linear-gradient(135deg, #f0f4ff 0%, #f8f1ff 100%);
+            border-left: 4px solid #667eea;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+        .recommended-path strong {
+            color: #667eea;
+        }
+        footer {
+            background: rgba(0,0,0,0.1);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 8px;
+            margin-top: 3rem;
+        }
+        footer p {
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+        .cta-banner {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .cta-banner h2 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        .cta-banner p {
+            color: #666;
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+            .path-steps {
+                grid-template-columns: 1fr;
+            }
+            .cta-buttons {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Hugging Face Models Guide</h1>
+            <p>Complete Resource Hub for Understanding & Using LLMs</p>
+            <p class="subtitle">From Fundamentals to Advanced Implementation • 2.7M+ Models Covered</p>
+        </header>
+
+        <div class="breadcrumb">
+            📚 A comprehensive learning path with 5 interconnected guides
+        </div>
+
+        <div class="quick-stats">
+            <div class="stat-box">
+                <div class="stat-number">2.7M+</div>
+                <div class="stat-label">Models on Hub</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">Covered in Depth</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">1T+</div>
+                <div class="stat-label">Parameter Models</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">5</div>
+                <div class="stat-label">Learning Guides</div>
+            </div>
+        </div>
+
+        <div class="learning-path">
+            <h2>📖 Recommended Learning Path</h2>
+            <div class="path-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Start Here</h3>
+                    <p>Model Selection Guide</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Learn</h3>
+                    <p>Documentation & Overview</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Understand</h3>
+                    <p>Deep Dive Technical Guide</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Explore</h3>
+                    <p>Interactive Demos</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <h3>Build</h3>
+                    <p>Training & Fine-tuning</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="modules-grid">
+            <!-- Module 1: Model Selector -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🎯</div>
+                    <div class="module-title">Model Selector</div>
+                    <div class="module-subtitle">Find Your Perfect Model</div>
+                </div>
+                <div class="module-content">
+                    <div class="module-level level-beginner">Beginner-Friendly</div>
+                    <p class="module-description">
+                        Interactive tool to help you choose the right model based on your specific use case, priorities, and constraints.
+                    </p>
+                    <ul class="module-features">
+                        <li>15+ models with detailed specs</li>
+                        <li>Interactive recommendation engine</li>
+                        <li>Filter by task, budget, speed</li>
+                        <li>Commercial & open-source options</li>
+                        <li>Cost comparison calculator</li>
+                    </ul>
+                    <a href="model_selector.html" class="module-cta">Open Model Selector →</a>
+                </div>
+            </div>
+
+            <!-- Module 2: Documentation -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">📚</div>
+                    <div class="module-title">Complete Documentation</div>
+                    <div class="module-subtitle">Reference & Overview</div>
+                </div>
+                <div class="module-content">
+                    <div class="module-level level-beginner">Beginner-Friendly</div>
+                    <p class="module-description">
+                        Comprehensive guide covering all model categories: LLMs, embeddings, vision, audio, multimodal, and specialized models.
+                    </p>
+                    <ul class="module-features">
+                        <li>50+ models catalogued</li>
+                        <li>1T+ parameter commercial models</li>
+                        <li>Use case recommendations</li>
+                        <li>Quick selection guide</li>
+                        <li>Infrastructure requirements</li>
+                    </ul>
+                    <a href="models_documentation.html" class="module-cta">View Documentation →</a>
+                </div>
+            </div>
+
+            <!-- Module 3: Deep Dive -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🔬</div>
+                    <div class="module-title">Technical Deep Dive</div>
+                    <div class="module-subtitle">How Models Work</div>
+                </div>
+                <div class="module-content">
+                    <div class="module-level level-advanced">Advanced</div>
+                    <p class="module-description">
+                        In-depth technical guide covering transformer architecture, parameters, quantization, timeline, and commercial models at 1T+ scale.
+                    </p>
+                    <ul class="module-features">
+                        <li>Transformer architecture explained</li>
+                        <li>Parameter tuning strategies</li>
+                        <li>Quantization methods & tradeoffs</li>
+                        <li>2017-2026 evolution timeline</li>
+                        <li>Magic quadrant & community feedback</li>
+                    </ul>
+                    <a href="models_deep_dive.html" class="module-cta">Explore Deep Dive →</a>
+                </div>
+            </div>
+
+            <!-- Module 4: Interactive Demos -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🎮</div>
+                    <div class="module-title">Interactive Demos</div>
+                    <div class="module-subtitle">Hands-On Learning</div>
+                </div>
+                <div class="module-content">
+                    <div class="module-level level-intermediate">Intermediate</div>
+                    <p class="module-description">
+                        Try before you implement. Interactive demonstrations of text generation, embeddings, quantization effects, and more.
+                    </p>
+                    <ul class="module-features">
+                        <li>Text generation with live adjustments</li>
+                        <li>Temperature & sampling effects</li>
+                        <li>Quantization comparison simulator</li>
+                        <li>Training simulation (FT vs LoRA)</li>
+                        <li>Real-time parameter visualization</li>
+                    </ul>
+                    <a href="interactive_demos.html" class="module-cta">Try Demos →</a>
+                </div>
+            </div>
+
+            <!-- Module 5: Training Guide -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🚀</div>
+                    <div class="module-title">Training & Fine-tuning</div>
+                    <div class="module-subtitle">From Beginner to Advanced</div>
+                </div>
+                <div class="module-content">
+                    <div class="module-level level-intermediate">Intermediate-Advanced</div>
+                    <p class="module-description">
+                        Step-by-step guides for fine-tuning models on your own data, from basic HF Trainer to advanced QLoRA implementations.
+                    </p>
+                    <ul class="module-features">
+                        <li>Beginner: 20-line starter code</li>
+                        <li>Intermediate: LoRA fine-tuning</li>
+                        <li>Advanced: QLoRA with 4-bit</li>
+                        <li>Data format examples</li>
+                        <li>Infrastructure & troubleshooting</li>
+                    </ul>
+                    <a href="training_guide.html" class="module-cta">Start Training →</a>
+                </div>
+            </div>
+
+            <!-- Module 6: README/Reference -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">📋</div>
+                    <div class="module-title">Quick Reference</div>
+                    <div class="module-subtitle">Markdown & CSV</div>
+                </div>
+                <div class="module-content">
+                    <div class="module-level level-beginner">All Levels</div>
+                    <p class="module-description">
+                        Downloadable reference materials: markdown guides, CSV model catalogs, comparison tables, and checklists for quick lookup.
+                    </p>
+                    <ul class="module-features">
+                        <li>40+ model CSV reference</li>
+                        <li>Markdown guides</li>
+                        <li>Comparison tables</li>
+                        <li>Setup checklists</li>
+                        <li>Performance charts</li>
+                    </ul>
+                    <a href="huggingface_models_guide.md" class="module-cta">View Reference →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="cta-banner">
+            <h2>Quick Start: Which Guide Should I Read First?</h2>
+            <p>Not sure where to begin? Choose based on your goal:</p>
+            <div class="cta-buttons">
+                <a href="model_selector.html" class="btn btn-primary">I want to pick a model →</a>
+                <a href="models_documentation.html" class="btn btn-primary">I want to learn basics →</a>
+                <a href="models_deep_dive.html" class="btn btn-primary">I want technical details →</a>
+                <a href="interactive_demos.html" class="btn btn-primary">I want to try demos →</a>
+                <a href="training_guide.html" class="btn btn-primary">I want to train a model →</a>
+            </div>
+        </div>
+
+        <div class="faq-section">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <div class="faq-question">Q: Which model should I use for my project?</div>
+                    <div class="faq-answer">Start with the <strong>Model Selector</strong> tool. Answer 4-5 questions about your use case, and it will recommend the best model(s) with explanations.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">Q: What's the difference between open-source and commercial models?</div>
+                    <div class="faq-answer">See the <strong>Complete Documentation</strong> Commercial Models section. Commercial models (1T+ params) offer 92-97% quality; open-source (70B) offers 90-92% at 1-10% cost.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">Q: What is quantization and why does it matter?</div>
+                    <div class="faq-answer">Check the <strong>Technical Deep Dive</strong> → Quantization section. It explains FP32, INT8, GPTQ, and AWQ with 75% VRAM savings at only 5-10% quality loss.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">Q: How do I fine-tune a model on my own data?</div>
+                    <div class="faq-answer">Head to <strong>Training & Fine-tuning</strong>. It has 3 levels: beginner (20 lines), intermediate (LoRA), advanced (QLoRA with 4-bit quantization).</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">Q: What parameters affect model output?</div>
+                    <div class="faq-answer">See <strong>Interactive Demos</strong> or <strong>Technical Deep Dive → Parameters</strong>. Learn about temperature (0-2), top-p, penalties, and context window effects.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">Q: How do I choose between Llama, Qwen, Mistral, Claude, GPT-4?</div>
+                    <div class="faq-answer">The <strong>Magic Quadrant</strong> in Technical Deep Dive shows adoption vs maturity. Llama 3.3 70B is the production standard; Claude 3.5/Opus for best quality.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">Q: How much VRAM do I need?</div>
+                    <div class="faq-answer"><strong>Complete Documentation</strong> has a hardware requirements table. Generally: 7B needs 4GB (4-bit), 70B needs 40GB (4-bit), commercial models need API access.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">Q: What's the cost difference between models at scale?</div>
+                    <div class="faq-answer"><strong>Technical Deep Dive → Commercial Models</strong> has cost tables. Opus 4.6: $15+/1M tokens; Claude 3.5: $3-15/1M; Open-source: $0-2/1M or free locally.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="recommended-path">
+            <strong>🎯 First-Time Visitor Recommended Path:</strong>
+            <ol style="margin: 1rem 0; padding-left: 1.5rem; color: #333;">
+                <li style="margin: 0.5rem 0;"><strong>5 minutes:</strong> Read this page (you're here!) for overview</li>
+                <li style="margin: 0.5rem 0;"><strong>10 minutes:</strong> Open <strong>Model Selector</strong>, answer questions, get recommendation</li>
+                <li style="margin: 0.5rem 0;"><strong>20 minutes:</strong> Read relevant section in <strong>Complete Documentation</strong> about recommended model</li>
+                <li style="margin: 0.5rem 0;"><strong>30 minutes:</strong> Explore <strong>Interactive Demos</strong> to see parameters in action</li>
+                <li style="margin: 0.5rem 0;"><strong>As needed:</strong> Deep dive into <strong>Technical Guide</strong> or <strong>Training Guide</strong></li>
+            </ol>
+        </div>
+
+        <div class="faq-section" style="background: linear-gradient(135deg, #f0f4ff 0%, #f8f1ff 100%); border-left: 4px solid #667eea;">
+            <h2 style="color: #667eea;">📊 What's Covered in Each Guide?</h2>
+
+            <div style="margin: 1.5rem 0;">
+                <h3 style="color: #764ba2; font-size: 1.1rem; margin: 1rem 0 0.5rem 0;">1. Model Selector (model_selector.html)</h3>
+                <p style="color: #666; margin: 0.5rem 0;">🎯 Interactive tool | 5-10 min</p>
+                <p style="color: #666; line-height: 1.6;">Tasks (chat, code, embeddings, vision), priorities (quality/speed/cost/balance), constraints (VRAM, latency, multimodal), preferences (open-source, mobile). Algorithm scores 15+ models and ranks them.</p>
+            </div>
+
+            <div style="margin: 1.5rem 0;">
+                <h3 style="color: #764ba2; font-size: 1.1rem; margin: 1rem 0 0.5rem 0;">2. Complete Documentation (models_documentation.html)</h3>
+                <p style="color: #666; margin: 0.5rem 0;">📚 Reference guide | 30-45 min read</p>
+                <p style="color: #666; line-height: 1.6;">6 categories: LLMs (open-source), commercial models (1T+ params), embeddings, vision, audio, multimodal, specialized. 50+ models with Hub links, benchmarks, comparison tables, selection guides, infrastructure requirements.</p>
+            </div>
+
+            <div style="margin: 1.5rem 0;">
+                <h3 style="color: #764ba2; font-size: 1.1rem; margin: 1rem 0 0.5rem 0;">3. Technical Deep Dive (models_deep_dive.html)</h3>
+                <p style="color: #666; margin: 0.5rem 0;">🔬 Advanced learning | 1-2 hour read</p>
+                <p style="color: #666; line-height: 1.6;">Transformer architecture (attention, tokens, O(n²)), paradigms (encoder/decoder/encoder-decoder), parameters (temp, top-p, context), quantization (FP32→INT8→GPTQ), timeline (2017-2026), magic quadrant, community sentiment, commercial model benchmarks.</p>
+            </div>
+
+            <div style="margin: 1.5rem 0;">
+                <h3 style="color: #764ba2; font-size: 1.1rem; margin: 1rem 0 0.5rem 0;">4. Interactive Demos (interactive_demos.html)</h3>
+                <p style="color: #666; margin: 0.5rem 0;">🎮 Hands-on | 20-30 min exploration</p>
+                <p style="color: #666; line-height: 1.6;">6 interactive sections: text generation (adjust temp/top-p/penalties), embeddings (similarity), classification (zero-shot), parameter tuning visualization, quantization comparison, training simulation (FT vs LoRA vs QLoRA).</p>
+            </div>
+
+            <div style="margin: 1.5rem 0;">
+                <h3 style="color: #764ba2; font-size: 1.1rem; margin: 1rem 0 0.5rem 0;">5. Training & Fine-tuning (training_guide.html)</h3>
+                <p style="color: #666; margin: 0.5rem 0;">🚀 Implementation guide | 1-2 hour read + coding</p>
+                <p style="color: #666; line-height: 1.6;">3 difficulty levels: beginner (20-line HF Trainer), intermediate (LoRA r=8), advanced (QLoRA 4-bit). Data formats (JSONL, CSV, conversation), infrastructure (cloud/local), troubleshooting (OOM, convergence).</p>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Hugging Face Models Guide - Complete Resource Hub</strong></p>
+            <p>April 2026 | 2.7M+ models on Hugging Face Hub | 50+ models covered in depth</p>
+            <p>Recommended learning time: 3-5 hours for comprehensive understanding</p>
+            <p style="margin-top: 1rem; opacity: 0.8;">Start with Model Selector → Documentation → Deep Dive → Demos → Training</p>
+        </footer>
+    </div>
+</body>
+</html>

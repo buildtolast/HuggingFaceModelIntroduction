@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hugging Face Models - Complete Training Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        nav {
+            background: white;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+        }
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background 0.3s;
+            font-size: 0.95rem;
+            display: block;
+        }
+        nav a:hover {
+            background: #f0f0f0;
+        }
+        section {
+            background: white;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        h3 {
+            color: #764ba2;
+            font-size: 1.4rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        h4 {
+            color: #667eea;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .level-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .level-beginner {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+        .level-intermediate {
+            background: #fff9c4;
+            color: #f57f17;
+        }
+        .level-advanced {
+            background: #ffccbc;
+            color: #d84315;
+        }
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 1.5rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .note {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ff9800;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        table th, table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #667eea;
+        }
+        table tbody tr:hover {
+            background: #f8f9fa;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .comparison-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            background: white;
+        }
+        .comparison-card h4 {
+            margin-top: 0;
+        }
+        .comparison-card ul {
+            list-style-position: inside;
+            font-size: 0.95rem;
+        }
+        .comparison-card li {
+            margin: 0.25rem 0;
+        }
+        .step-guide {
+            counter-reset: step-counter;
+            list-style: none;
+        }
+        .step-guide li {
+            counter-increment: step-counter;
+            margin-bottom: 1.5rem;
+            padding-left: 3rem;
+            position: relative;
+        }
+        .step-guide li:before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #667eea;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .step-guide strong {
+            display: block;
+            color: #764ba2;
+            margin-bottom: 0.25rem;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+        .comparison-table th, .comparison-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .comparison-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #667eea;
+        }
+        footer {
+            background: #333;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.8rem; }
+            nav ul { flex-direction: column; }
+            .comparison-grid { grid-template-columns: 1fr; }
+            .step-guide li { padding-left: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📚 Hugging Face Models - Complete Training Guide</h1>
+        <p>Learn how to fine-tune models from beginner to advanced level</p>
+    </header>
+
+    <div class="container">
+        <nav>
+            <ul>
+                <li><a href="#basics">Basics</a></li>
+                <li><a href="#beginner">Beginner</a></li>
+                <li><a href="#intermediate">Intermediate</a></li>
+                <li><a href="#advanced">Advanced</a></li>
+                <li><a href="#data">Data Prep</a></li>
+                <li><a href="#infrastructure">Infrastructure</a></li>
+                <li><a href="#troubleshooting">Troubleshooting</a></li>
+            </ul>
+        </nav>
+
+        <!-- BASICS -->
+        <section id="basics">
+            <h2>Training Fundamentals</h2>
+
+            <h3>What is Fine-tuning?</h3>
+            <p>Fine-tuning adapts a pre-trained model to your specific task by training it on your own data. The model retains general knowledge while learning task-specific patterns.</p>
+
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <h4>Pre-trained Model</h4>
+                    <p>Trained on 2+ trillion tokens of internet data. General knowledge but not specific to your domain.</p>
+                </div>
+                <div class="comparison-card">
+                    <h4>Fine-tuning</h4>
+                    <p>Further training on 1K-100K examples of your specific task. Adapts the model to your use case.</p>
+                </div>
+                <div class="comparison-card">
+                    <h4>Result</h4>
+                    <p>Task-specific model with better accuracy, lower latency, and smaller size than prompt engineering.</p>
+                </div>
+            </div>
+
+            <h3>When to Fine-tune vs Use Pre-trained</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Scenario</th>
+                        <th>Use Pre-trained Only</th>
+                        <th>Fine-tune</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>General chat/Q&A</td>
+                        <td>✓ Llama 3.3 works well</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Domain-specific (medical, legal)</td>
+                        <td>-</td>
+                        <td>✓ Fine-tune needed</td>
+                    </tr>
+                    <tr>
+                        <td>Your company's tone/style</td>
+                        <td>-</td>
+                        <td>✓ Fine-tune for consistency</td>
+                    </tr>
+                    <tr>
+                        <td>Few-shot learning works</td>
+                        <td>✓ Use in prompts</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>High-volume production</td>
+                        <td>-</td>
+                        <td>✓ Faster + cheaper than API</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Training Methods Overview</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Trainable Params</th>
+                        <th>VRAM (7B)</th>
+                        <th>Time</th>
+                        <th>Quality</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Full Fine-tuning</strong></td>
+                        <td>7B (100%)</td>
+                        <td>60GB+</td>
+                        <td>24-72h (8 GPUs)</td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                        <td>Research, max quality</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LoRA</strong></td>
+                        <td>1.6M (0.02%)</td>
+                        <td>24GB</td>
+                        <td>2-6h (1 GPU)</td>
+                        <td>⭐⭐⭐⭐</td>
+                        <td>Production, balanced</td>
+                    </tr>
+                    <tr style="background: #e8f5e9;">
+                        <td><strong>QLoRA</strong> ⭐</td>
+                        <td>1.6M (0.02%)</td>
+                        <td>8GB</td>
+                        <td>3-8h (1 GPU)</td>
+                        <td>⭐⭐⭐⭐</td>
+                        <td>Consumer GPU, most popular</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- BEGINNER -->
+        <section id="beginner">
+            <h2>Beginner: Simple Fine-tuning (20-line Code)</h2>
+            <span class="level-badge level-beginner">BEGINNER</span>
+
+            <div class="note">
+                <strong>Goal:</strong> Get a working fine-tuning pipeline running. We'll use Google Colab (free GPU) and Hugging Face Trainer (easiest API).
+            </div>
+
+            <h3>Step 1: Setup Environment</h3>
+            <div class="code-block">
+# Install required packages
+!pip install transformers datasets peft bitsandbytes -q
+
+# Login to Hugging Face
+from huggingface_hub import login
+login()  # You'll be prompted for your HF token
+            </div>
+
+            <h3>Step 2: Minimal Fine-tuning Example</h3>
+            <div class="code-block">
+from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, Trainer
+from datasets import load_dataset
+
+# 1. Load model and tokenizer
+model_name = "meta-llama/Llama-2-7b"
+model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto")
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+# 2. Load your data
+dataset = load_dataset("text", data_files={"train": "train.txt"})
+
+# 3. Tokenize
+def tokenize(sample):
+    return tokenizer(sample["text"], truncation=True, max_length=512)
+
+dataset = dataset.map(tokenize, batched=True)
+
+# 4. Setup training
+args = TrainingArguments(
+    output_dir="my-fine-tuned-model",
+    num_train_epochs=3,
+    per_device_train_batch_size=4,
+    learning_rate=2e-4,
+)
+
+# 5. Train
+trainer = Trainer(model=model, args=args, train_dataset=dataset["train"])
+trainer.train()
+
+# 6. Save
+model.save_pretrained("my-fine-tuned-model")
+            </div>
+
+            <h3>Expected Results</h3>
+            <ul>
+                <li>Training time: 2-4 hours on Colab (free T4 GPU)</li>
+                <li>VRAM needed: ~24GB (use FP16 or quantization)</li>
+                <li>Model size: 14GB (7B params × 2 bytes for FP16)</li>
+                <li>Quality improvement: 10-30% on your specific task</li>
+            </ul>
+
+            <div class="warning">
+                <strong>Common Issues:</strong>
+                <ul>
+                    <li><strong>Out of Memory?</strong> Reduce batch_size to 2 or use quantization</li>
+                    <li><strong>Model not loading?</strong> Ensure you have access to the model (e.g., accept Llama license)</li>
+                    <li><strong>Slow training?</strong> Normal on free GPU. Use paid GPU for 10× speedup</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- INTERMEDIATE -->
+        <section id="intermediate">
+            <h2>Intermediate: LoRA (Parameter-Efficient Fine-tuning)</h2>
+            <span class="level-badge level-intermediate">INTERMEDIATE</span>
+
+            <div class="success">
+                <strong>Why LoRA?</strong> Train only 1.6M parameters (0.02%) instead of 7B. 75% VRAM savings, faster training, same quality.
+            </div>
+
+            <h3>LoRA Architecture</h3>
+            <div class="code-block">
+Instead of updating W (7B params):
+W_new = W + ΔW
+
+With LoRA, decompose ΔW:
+ΔW = B @ A  (where A: 7B×8, B: 8×7B)
+                    ↑ Only train these (1.6M params)
+
+Result: Same expressiveness, 1000× fewer parameters!
+            </div>
+
+            <h3>Complete LoRA Example</h3>
+            <div class="code-block">
+from peft import LoraConfig, get_peft_model
+from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments
+from datasets import load_dataset
+
+# 1. Load model
+model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b")
+tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b")
+
+# 2. Configure LoRA
+lora_config = LoraConfig(
+    r=8,                          # Rank
+    lora_alpha=16,                # Alpha for scaling
+    target_modules=["q_proj", "v_proj"],  # Which layers to adapt
+    lora_dropout=0.05,
+    bias="none",
+    task_type="CAUSAL_LM"
+)
+
+# 3. Apply LoRA
+model = get_peft_model(model, lora_config)
+model.print_trainable_parameters()
+# Output: trainable params: 1,638,400 || all params: 6,738,415,616 (0.02%)
+
+# 4. Prepare data
+dataset = load_dataset("text", data_files={"train": "train.txt"})
+def preprocess(sample):
+    return tokenizer(sample["text"], truncation=True, max_length=512)
+dataset = dataset.map(preprocess, batched=True)
+
+# 5. Train
+training_args = TrainingArguments(
+    output_dir="lora-model",
+    per_device_train_batch_size=16,  # Can use larger batch with LoRA
+    num_train_epochs=3,
+    learning_rate=2e-4,
+    save_strategy="epoch",
+    logging_steps=100,
+)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=dataset["train"],
+)
+trainer.train()
+
+# 6. Save only LoRA weights (~50MB!)
+model.save_pretrained("lora-adapter")
+            </div>
+
+            <h3>LoRA Best Practices</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Typical Value</th>
+                        <th>What it does</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>r (rank)</strong></td>
+                        <td>8-16</td>
+                        <td>Higher = more expressive but slower. 8 is usually enough</td>
+                    </tr>
+                    <tr>
+                        <td><strong>lora_alpha</strong></td>
+                        <td>16-32</td>
+                        <td>Scaling factor. Usually 2× r</td>
+                    </tr>
+                    <tr>
+                        <td><strong>target_modules</strong></td>
+                        <td>q_proj, v_proj</td>
+                        <td>Which transformer layers to adapt. Start with Q and V</td>
+                    </tr>
+                    <tr>
+                        <td><strong>lora_dropout</strong></td>
+                        <td>0.05-0.1</td>
+                        <td>Regularization. Prevents overfitting</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Using a LoRA-trained Model</h3>
+            <div class="code-block">
+from peft import AutoPeftModelForCausalLM
+
+# Load base model + LoRA adapter
+model = AutoPeftModelForCausalLM.from_pretrained("lora-adapter")
+
+# Use like normal
+inputs = tokenizer("Hello,", return_tensors="pt")
+outputs = model.generate(**inputs)
+print(tokenizer.decode(outputs[0]))
+            </div>
+        </section>
+
+        <!-- ADVANCED -->
+        <section id="advanced">
+            <h2>Advanced: QLoRA (Quantized LoRA)</h2>
+            <span class="level-badge level-advanced">ADVANCED</span>
+
+            <div class="success">
+                <strong>QLoRA = LoRA + 4-bit Quantization</strong><br>
+                Run 7B models on 8GB VRAM (RTX 4090). Same quality as LoRA, 3× cheaper hardware.
+            </div>
+
+            <h3>QLoRA Complete Example</h3>
+            <div class="code-block">
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
+
+# 1. Quantization config (4-bit)
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype="float16",
+    bnb_4bit_use_double_quant=True,
+)
+
+# 2. Load model in 4-bit
+model = AutoModelForCausalLM.from_pretrained(
+    "meta-llama/Llama-2-7b",
+    quantization_config=bnb_config,
+    device_map="auto"
+)
+
+# 3. Prepare for training
+model = prepare_model_for_kbit_training(model)
+
+# 4. Setup LoRA on quantized model
+lora_config = LoraConfig(
+    r=8,
+    lora_alpha=16,
+    target_modules=["q_proj", "v_proj"],
+    lora_dropout=0.05,
+    bias="none",
+    task_type="CAUSAL_LM"
+)
+
+model = get_peft_model(model, lora_config)
+
+# 5. Training (same as LoRA)
+# ... (see LoRA example above)
+            </div>
+
+            <h3>QLoRA Memory Breakdown</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>7B Model</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Model weights (4-bit)</td>
+                        <td>1.75GB</td>
+                        <td>7B params × 2.5 bits</td>
+                    </tr>
+                    <tr>
+                        <td>LoRA adapters</td>
+                        <td>~0.1GB</td>
+                        <td>1.6M params × FP32</td>
+                    </tr>
+                    <tr>
+                        <td>Optimizer states</td>
+                        <td>2-4GB</td>
+                        <td>8-bit Adam</td>
+                    </tr>
+                    <tr>
+                        <td>Batch data + cache</td>
+                        <td>2-3GB</td>
+                        <td>batch_size=4, seq_len=512</td>
+                    </tr>
+                    <tr style="background: #e8f5e9; font-weight: 600;">
+                        <td><strong>TOTAL</strong></td>
+                        <td><strong>6-9GB</strong></td>
+                        <td><strong>Fits in RTX 4090 (24GB)</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Advanced Techniques</h3>
+
+            <h4>1. Multi-GPU Training with DeepSpeed</h4>
+            <div class="code-block">
+# For 8+ GPUs, use DeepSpeed for distributed training
+training_args = TrainingArguments(
+    output_dir="model",
+    num_train_epochs=3,
+    per_device_train_batch_size=8,
+    gradient_accumulation_steps=4,
+    optim="adafactors",  # Memory efficient optimizer
+    deepspeed="ds_config.json"  # DeepSpeed config
+)
+
+# ds_config.json (minimal):
+{
+    "fp16": {"enabled": true},
+    "optimizer": {"type": "Adam", "params": {"lr": 0.0002}},
+    "zero_optimization": {
+        "stage": 2,  # Stage 2 ZeRO
+        "offload_optimizer": {"device": "cpu"}
+    }
+}
+            </div>
+
+            <h4>2. DPO (Direct Preference Optimization)</h4>
+            <p>Train with human preference data instead of RLHF:</p>
+            <div class="code-block">
+from trl import DPOTrainer
+
+# Format: (prompt, chosen_response, rejected_response)
+# Example:
+# "What is 2+2?" -> "4" (chosen) vs "5" (rejected)
+
+trainer = DPOTrainer(
+    model=model,
+    args=training_args,
+    train_dataset=preference_dataset,
+    beta=0.1,  # Temperature for preference
+)
+trainer.train()
+            </div>
+
+            <h4>3. Custom Training Loop with Accelerate</h4>
+            <div class="code-block">
+from accelerate import Accelerator
+
+accelerator = Accelerator()
+
+model, optimizer, train_dataloader = accelerator.prepare(
+    model, optimizer, train_dataloader
+)
+
+for epoch in range(num_epochs):
+    for batch in train_dataloader:
+        outputs = model(**batch)
+        loss = outputs.loss
+
+        accelerator.backward(loss)
+        optimizer.step()
+        optimizer.zero_grad()
+            </div>
+        </section>
+
+        <!-- DATA PREPARATION -->
+        <section id="data">
+            <h2>Data Preparation: Formats & Best Practices</h2>
+
+            <h3>JSONL Format (Recommended for Chat)</h3>
+            <div class="code-block">
+# Each line is a complete JSON object
+{"text": "User: Hello, how are you?\nAssistant: I'm doing well, thanks!"}
+{"text": "User: What is Python?\nAssistant: Python is a programming language..."}
+            </div>
+
+            <h3>Conversation Format</h3>
+            <div class="code-block">
+{
+  "messages": [
+    {"role": "user", "content": "What's the capital of France?"},
+    {"role": "assistant", "content": "Paris"},
+    {"role": "user", "content": "Tell me more about it"},
+    {"role": "assistant", "content": "Paris is the largest city in France..."}
+  ]
+}
+            </div>
+
+            <h3>Instruction-following Format</h3>
+            <div class="code-block">
+{
+  "instruction": "Summarize this text",
+  "input": "Machine learning is a subset of AI...",
+  "output": "ML is a branch of AI focused on learning from data."
+}
+            </div>
+
+            <h3>CSV Format (Classification)</h3>
+            <div class="code-block">
+text,label
+"This product is amazing!",positive
+"Terrible experience",negative
+"It's okay",neutral
+            </div>
+
+            <h3>Data Quality Guidelines</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Guideline</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Consistency:</strong> Same format throughout</td>
+                        <td>All examples same structure, no missing fields</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Clarity:</strong> Clear, correct examples</td>
+                        <td>Examples should reflect desired output</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Diversity:</strong> Varied examples</td>
+                        <td>Cover edge cases and different styles</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Size:</strong> 1K-100K examples typical</td>
+                        <td>1K for simple tasks, 10K+ for complex</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Dataset Size Recommendations</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Task Complexity</th>
+                        <th>Recommended Size</th>
+                        <th>Examples</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Simple (classification)</td>
+                        <td>1K - 5K</td>
+                        <td>Sentiment analysis, intent detection</td>
+                    </tr>
+                    <tr>
+                        <td>Medium (instruction)</td>
+                        <td>5K - 20K</td>
+                        <td>Summarization, Q&A, writing</td>
+                    </tr>
+                    <tr>
+                        <td>Complex (domain)</td>
+                        <td>20K - 100K</td>
+                        <td>Medical, legal, technical writing</td>
+                    </tr>
+                    <tr>
+                        <td>Very complex (reasoning)</td>
+                        <td>50K - 500K</td>
+                        <td>Math, coding, complex reasoning</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Preparing Your Own Dataset</h3>
+            <ol class="step-guide">
+                <li>
+                    <strong>Collect Examples</strong>
+                    <p>Gather 1K+ examples of your task. Sources: customer data, annotation, synthetic data</p>
+                </li>
+                <li>
+                    <strong>Clean & Normalize</strong>
+                    <p>Remove duplicates, fix formatting, remove PII, normalize text</p>
+                </li>
+                <li>
+                    <strong>Format Consistently</strong>
+                    <p>Convert to JSONL or chosen format. Ensure all fields present</p>
+                </li>
+                <li>
+                    <strong>Split Data</strong>
+                    <p>80% train, 10% validation, 10% test</p>
+                </li>
+                <li>
+                    <strong>Validate Quality</strong>
+                    <p>Sample 100 examples, check for errors, inconsistencies</p>
+                </li>
+                <li>
+                    <strong>Upload to Hub (optional)</strong>
+                    <p><code>huggingface_hub.push_to_hub(dataset, "my-dataset")</code></p>
+                </li>
+            </ol>
+        </section>
+
+        <!-- INFRASTRUCTURE -->
+        <section id="infrastructure">
+            <h2>Infrastructure & Hardware</h2>
+
+            <h3>Hardware Requirements by Method</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Min GPU</th>
+                        <th>Recommended</th>
+                        <th>Cost (1 GPU-day)</th>
+                        <th>Training Speed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Full FT (7B)</strong></td>
+                        <td>A100 80GB (2×)</td>
+                        <td>A100 (8×)</td>
+                        <td>$50-100</td>
+                        <td>~12h per epoch</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LoRA (7B)</strong></td>
+                        <td>A100 40GB</td>
+                        <td>A100 80GB</td>
+                        <td>$10-20</td>
+                        <td>~2h per epoch</td>
+                    </tr>
+                    <tr style="background: #e8f5e9;">
+                        <td><strong>QLoRA (7B)</strong> ⭐</td>
+                        <td>RTX 4090 24GB</td>
+                        <td>A100 40GB</td>
+                        <td>$1-5</td>
+                        <td>~3h per epoch</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Cloud Providers</h3>
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <h4>Google Colab (Free)</h4>
+                    <ul>
+                        <li>Free T4 GPU (~10h/day)</li>
+                        <li>Great for learning</li>
+                        <li>Slow but accessible</li>
+                        <li>QLoRA recommended</li>
+                    </ul>
+                </div>
+
+                <div class="comparison-card">
+                    <h4>Lambda Labs</h4>
+                    <ul>
+                        <li>$0.50-2/hr for GPUs</li>
+                        <li>A100, H100 available</li>
+                        <li>SSH access (full control)</li>
+                        <li>$10 free credit</li>
+                    </ul>
+                </div>
+
+                <div class="comparison-card">
+                    <h4>Vast.ai</h4>
+                    <ul>
+                        <li>Cheapest on-demand</li>
+                        <li>$0.20-1/hr typical</li>
+                        <li>Community-run (may shutdown)</li>
+                        <li>Good for budget training</li>
+                    </ul>
+                </div>
+
+                <div class="comparison-card">
+                    <h4>HuggingFace Spaces</h4>
+                    <ul>
+                        <li>Integrated with Hub</li>
+                        <li>Free CPU + tier A10G</li>
+                        <li>Easy deployment</li>
+                        <li>For inference mainly</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Local Setup with Docker</h3>
+            <div class="code-block">
+# Dockerfile for training
+FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
+
+RUN apt-get update && apt-get install -y python3-pip
+RUN pip install torch transformers datasets peft bitsandbytes
+
+WORKDIR /workspace
+CMD ["bash"]
+
+# Build and run:
+# docker build -t training:latest .
+# docker run --gpus all -v $(pwd):/workspace training:latest
+            </div>
+        </section>
+
+        <!-- TROUBLESHOOTING -->
+        <section id="troubleshooting">
+            <h2>Troubleshooting Guide</h2>
+
+            <h3>Out of Memory (OOM)</h3>
+            <div class="warning">
+                <strong>Error:</strong> RuntimeError: CUDA out of memory
+            </div>
+            <ol class="step-guide">
+                <li>
+                    <strong>Reduce batch_size</strong>
+                    <p><code>per_device_train_batch_size = 2</code> (try smaller)</p>
+                </li>
+                <li>
+                    <strong>Reduce sequence length</strong>
+                    <p><code>max_length = 256</code> instead of 512</p>
+                </li>
+                <li>
+                    <strong>Use gradient accumulation</strong>
+                    <p><code>gradient_accumulation_steps = 4</code> (simulates batch_size × 4)</p>
+                </li>
+                <li>
+                    <strong>Enable gradient checkpointing</strong>
+                    <p><code>model.gradient_checkpointing_enable()</code></p>
+                </li>
+                <li>
+                    <strong>Use 8-bit or 4-bit quantization</strong>
+                    <p>Reduces model VRAM by 50-75%</p>
+                </li>
+            </ol>
+
+            <h3>Model Not Converging</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Issue</th>
+                        <th>Solution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Loss doesn't decrease</td>
+                        <td>Lower learning_rate (try 1e-5) or increase training epochs</td>
+                    </tr>
+                    <tr>
+                        <td>Loss spikes randomly</td>
+                        <td>Gradient clipping: <code>max_grad_norm = 1.0</code></td>
+                    </tr>
+                    <tr>
+                        <td>Loss oscillates</td>
+                        <td>Learning rate too high. Try 0.5× current value</td>
+                    </tr>
+                    <tr>
+                        <td>Overfitting (train loss ↓, val loss ↑)</td>
+                        <td>Add more training data, increase dropout, reduce epochs</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Training is Slow</h3>
+            <ul>
+                <li><strong>Check GPU utilization:</strong> <code>nvidia-smi</code> should show 80%+ usage</li>
+                <li><strong>Increase batch size</strong> (if VRAM allows)</li>
+                <li><strong>Use mixed precision:</strong> <code>fp16=True</code></li>
+                <li><strong>Enable Flash Attention:</strong> Much faster attention mechanism</li>
+                <li><strong>Use faster GPU</strong> (H100 >> A100 >> V100)</li>
+            </ul>
+
+            <h3>Model Quality Issues</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Problem</th>
+                        <th>Cause</th>
+                        <th>Fix</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Output is gibberish</td>
+                        <td>Data format wrong or tokenizer issue</td>
+                        <td>Verify data format, check tokenization</td>
+                    </tr>
+                    <tr>
+                        <td>Model ignores your instructions</td>
+                        <td>Too little instruction-following data</td>
+                        <td>Add more diverse instruction examples</td>
+                    </tr>
+                    <tr>
+                        <td>Repetitive outputs</td>
+                        <td>Training data has repetitive patterns</td>
+                        <td>Clean data, add diversity, increase top_p</td>
+                    </tr>
+                    <tr>
+                        <td>Model forgets base knowledge</td>
+                        <td>Catastrophic forgetting from small dataset</td>
+                        <td>Add original pre-training data to mix</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Hugging Face Models - Complete Training Guide</p>
+        <p><a href="model_selector.html" style="color: #667eea;">← Back to Model Selector</a> | <a href="interactive_demos.html" style="color: #667eea;">Try Interactive Demos →</a></p>
+    </footer>
+</body>
+</html>

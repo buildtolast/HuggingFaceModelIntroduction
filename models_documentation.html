@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hugging Face Models Guide - Comprehensive Reference</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        nav {
+            background: white;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        nav a:hover {
+            background: #f0f0f0;
+        }
+        section {
+            background: white;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        h3 {
+            color: #764ba2;
+            font-size: 1.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .subsection {
+            margin-bottom: 2rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        table thead {
+            background: #f8f9fa;
+        }
+        table th, table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        table th {
+            font-weight: 600;
+            color: #667eea;
+        }
+        table tbody tr:hover {
+            background: #f5f5f5;
+        }
+        table a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        table a:hover {
+            text-decoration: underline;
+        }
+        .model-card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .model-card h4 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        .specs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .spec-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+        .spec-label {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+        .spec-value {
+            font-size: 1.1rem;
+            color: #333;
+            margin-top: 0.25rem;
+        }
+        .decision-tree {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .comparison-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            background: white;
+        }
+        .comparison-card h4 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        .comparison-card ul {
+            list-style-position: inside;
+            font-size: 0.9rem;
+        }
+        .comparison-card li {
+            margin: 0.25rem 0;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .badge.category-llm { background: #667eea; }
+        .badge.category-vision { background: #764ba2; }
+        .badge.category-audio { background: #f09433; }
+        .badge.category-multimodal { background: #ec4899; }
+        .badge.category-embedding { background: #06b6d4; }
+        .highlight {
+            background: #fffacd;
+            padding: 0.2rem 0.4rem;
+            border-radius: 2px;
+        }
+        .toc {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .toc h3 {
+            margin-top: 0;
+        }
+        .toc ol {
+            list-style-position: inside;
+        }
+        .toc li {
+            margin: 0.5rem 0;
+        }
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        footer {
+            background: #333;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-right: 1rem;
+            margin-top: 1rem;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #764ba2;
+        }
+        .note {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ff9800;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.8rem; }
+            nav ul { flex-direction: column; }
+            table { font-size: 0.8rem; }
+            .specs { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Hugging Face Models Guide</h1>
+        <p>Comprehensive Reference for 2.7M+ Models across All Categories</p>
+        <p style="font-size: 0.9rem; margin-top: 1rem;">As of April 2026</p>
+    </header>
+
+    <div class="container">
+        <nav>
+            <ul>
+                <li><a href="#llms">LLMs</a></li>
+                <li><a href="#commercial">Commercial (1T+)</a></li>
+                <li><a href="#embeddings">Embeddings</a></li>
+                <li><a href="#vision">Vision</a></li>
+                <li><a href="#audio">Audio</a></li>
+                <li><a href="#multimodal">Multimodal</a></li>
+                <li><a href="#specialized">Specialized</a></li>
+                <li><a href="#selection">Selection Guide</a></li>
+            </ul>
+        </nav>
+
+        <div class="toc">
+            <h3>Quick Navigation</h3>
+            <ol>
+                <li><a href="#llms">Large Language Models (Text Generation)</a></li>
+                <li><a href="#commercial">Commercial Models (1+ Trillion Parameters)</a></li>
+                <li><a href="#embeddings">Embedding Models (Feature Extraction)</a></li>
+                <li><a href="#vision">Vision Models (Image Understanding)</a></li>
+                <li><a href="#audio">Audio Models (Speech & Sound)</a></li>
+                <li><a href="#multimodal">Multimodal Models (Vision-Language)</a></li>
+                <li><a href="#specialized">Specialized Models</a></li>
+                <li><a href="#selection">Model Selection Guide</a></li>
+                <li><a href="#benchmarks">Benchmarks & Evaluation</a></li>
+                <li><a href="#infrastructure">Deployment & Infrastructure</a></li>
+            </ol>
+        </div>
+
+        <section id="llms">
+            <h2>1. Large Language Models (LLMs)</h2>
+
+            <div class="note">
+                <strong>Note:</strong> As of March 2026, there are 670+ models on the Open LLM Leaderboard. This guide covers the most practical and widely-used models for developers.
+            </div>
+
+            <h3>Flagship Models (70B+ Parameters)</h3>
+            <p>Best-in-class models for complex tasks, reasoning, and production use cases.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Parameters</th>
+                        <th>Context</th>
+                        <th>VRAM (4-bit)</th>
+                        <th>Best For</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Llama 3.3 70B Instruct</strong></td>
+                        <td>70B</td>
+                        <td>128k</td>
+                        <td>40GB</td>
+                        <td>High-quality chat, agents</td>
+                        <td><a href="https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>DeepSeek-R1</strong></td>
+                        <td>671B</td>
+                        <td>128k</td>
+                        <td>370GB+</td>
+                        <td>Complex reasoning</td>
+                        <td><a href="https://huggingface.co/deepseek-ai/DeepSeek-R1">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Qwen3 (MoE)</strong></td>
+                        <td>235B / 22B active</td>
+                        <td>128k+</td>
+                        <td>125GB+</td>
+                        <td>Multilingual, reasoning</td>
+                        <td><a href="https://huggingface.co/Qwen/Qwen3">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mixtral 8x22B</strong></td>
+                        <td>141B / 44B active</td>
+                        <td>64k</td>
+                        <td>73GB</td>
+                        <td>Efficient reasoning</td>
+                        <td><a href="https://huggingface.co/mistralai/Mixtral-8x22B">Hub</a></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Lightweight Models (1B-13B Parameters)</h3>
+            <p>Perfect for mobile, edge deployment, and cost-sensitive applications.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Parameters</th>
+                        <th>VRAM (4-bit)</th>
+                        <th>Best For</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Gemma 3 4B</strong></td>
+                        <td>4B</td>
+                        <td>2GB</td>
+                        <td>Mobile, multilingual</td>
+                        <td><a href="https://huggingface.co/google/gemma-3-4b-it">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Llama 3.2 1B</strong></td>
+                        <td>1B</td>
+                        <td>1GB</td>
+                        <td>Ultra-lightweight</td>
+                        <td><a href="https://huggingface.co/meta-llama/Llama-3.2-1B">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Qwen2.5 7B</strong></td>
+                        <td>7B</td>
+                        <td>4GB</td>
+                        <td>Mobile-friendly</td>
+                        <td><a href="https://huggingface.co/Qwen/Qwen2.5-7B">Hub</a></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="success">
+                <strong>Recommendation:</strong> For most developers, <strong>Llama 3.3 70B Instruct</strong> offers the best balance of quality and accessibility. For mobile/edge, use <strong>Gemma 3 4B</strong> or <strong>Qwen2.5 7B</strong>.
+            </div>
+        </section>
+
+        <section id="commercial">
+            <h2>Commercial LLMs (1+ Trillion Parameters)</h2>
+
+            <p>Enterprise-grade models with trillion-parameter scale, offering advanced reasoning, multimodal capabilities, and extended context windows. These models are available via API only.</p>
+
+            <h3>Advanced Reasoning & Language Models</h3>
+            <p>Premium tier models optimized for complex reasoning, research, and mission-critical applications.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Parameters</th>
+                        <th>Context Window</th>
+                        <th>Primary Strengths</th>
+                        <th>Provider</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Opus 4.6</strong></td>
+                        <td>~1.2-1.5 Trillion</td>
+                        <td>200k+ tokens</td>
+                        <td>Deepest reasoning, research-grade analysis, complex problem solving</td>
+                        <td>Anthropic</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Claude 3.5 Sonnet</strong></td>
+                        <td>2-3 Trillion (est.)</td>
+                        <td>200k tokens</td>
+                        <td>Strong reasoning, minimal hallucination, excellent code generation</td>
+                        <td>Anthropic</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GPT-4 Turbo</strong></td>
+                        <td>1.7 Trillion</td>
+                        <td>128k tokens</td>
+                        <td>Balanced performance, broad capability, large benchmark datasets</td>
+                        <td>OpenAI</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GPT-4 Omni (o4)</strong></td>
+                        <td>1.7 Trillion</td>
+                        <td>128k tokens</td>
+                        <td>Faster inference than GPT-4T, multimodal (text, image, video, audio)</td>
+                        <td>OpenAI</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Multimodal Models (Vision-Language)</h3>
+            <p>Models with native support for images, videos, and other modalities alongside text.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Parameters</th>
+                        <th>Context Window</th>
+                        <th>Modalities</th>
+                        <th>Key Feature</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Gemini 2.0 Pro</strong></td>
+                        <td>1.9 Trillion</td>
+                        <td>1 Million tokens</td>
+                        <td>Text, image, video, audio</td>
+                        <td>Largest context window (1M), multimodal understanding</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Use Cases by Model</h3>
+
+            <div class="parameter-card" style="margin-bottom: 1.5rem;">
+                <h4>Opus 4.6 → When to Choose</h4>
+                <p><strong>Best for:</strong> Research papers, scientific analysis, complex mathematical proofs, deep reasoning tasks, legal document analysis, architectural design decisions.</p>
+                <p><strong>When NOT to use:</strong> Cost-sensitive applications, latency-critical systems (slowest at ~800ms), simple Q&A tasks.</p>
+                <p><strong>Cost:</strong> $15+/1M tokens (most expensive)</p>
+            </div>
+
+            <div class="parameter-card" style="margin-bottom: 1.5rem;">
+                <h4>Claude 3.5 Sonnet → When to Choose</h4>
+                <p><strong>Best for:</strong> Production applications, software engineering, content analysis, less hallucination-prone reasoning.</p>
+                <p><strong>When NOT to use:</strong> When maximum reasoning depth is needed (use Opus 4.6 instead), very cost-constrained (expensive at $3-15/1M).</p>
+                <p><strong>Cost:</strong> $3-15/1M tokens (high)</p>
+            </div>
+
+            <div class="parameter-card" style="margin-bottom: 1.5rem;">
+                <h4>GPT-4 Turbo → When to Choose</h4>
+                <p><strong>Best for:</strong> General-purpose tasks, balanced quality/speed, established production systems already using OpenAI.</p>
+                <p><strong>When NOT to use:</strong> When better reasoning is required (use Opus 4.6), when 1M context is needed (use Gemini 2.0).</p>
+                <p><strong>Cost:</strong> $10-30/1M tokens (high)</p>
+            </div>
+
+            <div class="parameter-card" style="margin-bottom: 1.5rem;">
+                <h4>Gemini 2.0 Pro → When to Choose</h4>
+                <p><strong>Best for:</strong> Document-heavy applications (entire books, movie scripts), multimodal tasks, image/video understanding, long-context reasoning.</p>
+                <p><strong>When NOT to use:</strong> Text-only applications (use GPT-4 or Claude instead), low-latency requirements (slightly slower).</p>
+                <p><strong>Cost:</strong> $5-20/1M tokens (competitive)</p>
+            </div>
+
+            <h3>Comparison: Open-Source vs. Commercial</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Commercial (1T+ params)</th>
+                        <th>Open-Source (70B)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Quality on MMLU</strong></td>
+                        <td>92-97%</td>
+                        <td>86-92%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reasoning Depth</strong></td>
+                        <td>Excellent (Opus, GPT-4)</td>
+                        <td>Good (Llama 3.3)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cost per 1M tokens</strong></td>
+                        <td>$3-20</td>
+                        <td>$0 (local) - $2 (API)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Latency</strong></td>
+                        <td>400-800ms</td>
+                        <td>50-200ms (local)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Context Window</strong></td>
+                        <td>128k-1M tokens</td>
+                        <td>8k-128k tokens</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Multimodal</strong></td>
+                        <td>Native (GPT-4o, Gemini)</td>
+                        <td>Requires separate models</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Local Deployment</strong></td>
+                        <td>API only</td>
+                        <td>Full control, privacy</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Customization</strong></td>
+                        <td>Prompt engineering, in-context learning</td>
+                        <td>Fine-tuning possible (LoRA, QLoRA)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="note">
+                <strong>Note:</strong> Commercial models (Opus 4.6, Claude 3.5, GPT-4, Gemini 2.0) are accessed via APIs only. Parameter counts are estimated by researchers based on model behavior benchmarking, as exact architecture details are proprietary. Open-source models like Llama 3.3 and Qwen provide transparent parameter counts.
+            </div>
+
+            <div class="warning">
+                <strong>Cost Consideration:</strong> At production scale, commercial model costs can exceed $100k/month. For budget-conscious applications, consider fine-tuned open-source models (Llama 3.3 70B with LoRA) as a cost-effective alternative offering 85-90% of commercial quality at 1-5% of API costs.
+            </div>
+        </section>
+
+        <section id="embeddings">
+            <h2>2. Embedding Models</h2>
+
+            <p>Convert text into fixed-size vectors for semantic search, clustering, and similarity tasks. These are among the most downloaded models on Hugging Face.</p>
+
+            <h3>Top Embedding Models</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Parameters</th>
+                        <th>Dimension</th>
+                        <th>Monthly Downloads</th>
+                        <th>Best For</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>all-MiniLM-L6-v2</strong></td>
+                        <td>22.7M</td>
+                        <td>384</td>
+                        <td>207M</td>
+                        <td>Lightweight semantic search</td>
+                        <td><a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>all-mpnet-base-v2</strong></td>
+                        <td>110M</td>
+                        <td>768</td>
+                        <td>28M</td>
+                        <td>High-quality embeddings</td>
+                        <td><a href="https://huggingface.co/sentence-transformers/all-mpnet-base-v2">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>multilingual-e5-large</strong></td>
+                        <td>560M</td>
+                        <td>1024</td>
+                        <td>5M+</td>
+                        <td>100+ language support</td>
+                        <td><a href="https://huggingface.co/intfloat/multilingual-e5-large">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>bge-base-en-v1.5</strong></td>
+                        <td>110M</td>
+                        <td>768</td>
+                        <td>5M+</td>
+                        <td>Retrieval optimization</td>
+                        <td><a href="https://huggingface.co/BAAI/bge-base-en-v1.5">Hub</a></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="success">
+                <strong>Recommendation:</strong> Start with <strong>all-MiniLM-L6-v2</strong> for speed, upgrade to <strong>all-mpnet-base-v2</strong> for better quality. Use <strong>multilingual-e5-large</strong> for cross-lingual tasks.
+            </div>
+        </section>
+
+        <section id="vision">
+            <h2>3. Vision Models</h2>
+
+            <h3>Image Classification</h3>
+            <p>Classify images into predefined categories. Vision Transformers (ViT) are the state-of-the-art approach.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Parameters</th>
+                        <th>Accuracy (ImageNet)</th>
+                        <th>Best For</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>google/vit-base-patch16-224-in21k</strong></td>
+                        <td>86M</td>
+                        <td>85.8%</td>
+                        <td>General classification</td>
+                        <td><a href="https://huggingface.co/google/vit-base-patch16-224">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>timm/mvitv2_large.fb_in1k</strong></td>
+                        <td>218M</td>
+                        <td>88.7%</td>
+                        <td>High-accuracy classification</td>
+                        <td><a href="https://huggingface.co/timm/mvitv2_large.fb_in1k">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>facebook/convnext-tiny-224</strong></td>
+                        <td>28.6M</td>
+                        <td>82.9%</td>
+                        <td>Efficient classification</td>
+                        <td><a href="https://huggingface.co/facebook/convnext-tiny-224">Hub</a></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Zero-Shot Image Classification</h3>
+            <p>Classify images without training on specific categories using CLIP and similar models.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Parameters</th>
+                        <th>Best For</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>openai/clip-vit-large-patch14</strong></td>
+                        <td>428M</td>
+                        <td>General zero-shot classification</td>
+                        <td><a href="https://huggingface.co/openai/clip-vit-large-patch14">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>google/siglip-so400m-patch14-384</strong></td>
+                        <td>400M</td>
+                        <td>Improved CLIP alternative</td>
+                        <td><a href="https://huggingface.co/google/siglip-so400m-patch14-384">Hub</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="audio">
+            <h2>4. Audio Models</h2>
+
+            <h3>Automatic Speech Recognition (ASR)</h3>
+            <p>Convert speech to text. Whisper is the dominant model with support for 96 languages and punctuation prediction.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Parameters</th>
+                        <th>Languages</th>
+                        <th>Best For</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>openai/whisper-large-v3</strong></td>
+                        <td>1.55B</td>
+                        <td>96</td>
+                        <td>Production ASR, highest accuracy</td>
+                        <td><a href="https://huggingface.co/openai/whisper-large-v3">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>openai/whisper-small</strong></td>
+                        <td>244M</td>
+                        <td>96</td>
+                        <td>Edge/mobile deployment</td>
+                        <td><a href="https://huggingface.co/openai/whisper-small">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>facebook/mms-1b-all</strong></td>
+                        <td>1B</td>
+                        <td>1,107</td>
+                        <td>Extreme multilingual support</td>
+                        <td><a href="https://huggingface.co/facebook/mms-1b-all">Hub</a></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Text-to-Speech (TTS)</h3>
+            <p>Generate natural-sounding speech from text.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Parameters</th>
+                        <th>Best For</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>hexgrad/Kokoro-82M</strong></td>
+                        <td>82M</td>
+                        <td>Fast, natural synthesis (3M downloads)</td>
+                        <td><a href="https://huggingface.co/hexgrad/Kokoro-82M">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>facebook/mms-tts</strong></td>
+                        <td>Varies</td>
+                        <td>1,100+ language TTS</td>
+                        <td><a href="https://huggingface.co/facebook/mms-tts">Hub</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="multimodal">
+            <h2>5. Multimodal Models - Vision-Language</h2>
+
+            <p>Models that understand both images and text, enabling visual QA, captioning, and reasoning.</p>
+
+            <h3>General-Purpose Vision-Language Models</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Parameters</th>
+                        <th>Context</th>
+                        <th>Best For</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Llama 3.2 Vision 11B</strong></td>
+                        <td>11B</td>
+                        <td>128k</td>
+                        <td>Lightweight vision-language chat</td>
+                        <td><a href="https://huggingface.co/meta-llama/Llama-3.2-11B-Vision">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Llama 3.2 Vision 90B</strong></td>
+                        <td>90B</td>
+                        <td>128k</td>
+                        <td>High-quality visual understanding</td>
+                        <td><a href="https://huggingface.co/meta-llama/Llama-3.2-90B-Vision">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Qwen3-VL-8B</strong></td>
+                        <td>8B</td>
+                        <td>32k</td>
+                        <td>Multimodal reasoning, efficient</td>
+                        <td><a href="https://huggingface.co/Qwen/Qwen3-VL-8B">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>LLaVA 1.6 34B</strong></td>
+                        <td>34B</td>
+                        <td>4k</td>
+                        <td>Strong instruction-following</td>
+                        <td><a href="https://huggingface.co/liuhaotian/llava-v1.6-34b">Hub</a></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Lightweight Vision-Language Models</h3>
+            <p>Perfect for mobile and edge deployment while maintaining good quality.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Parameters</th>
+                        <th>VRAM (4-bit)</th>
+                        <th>Best For</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>SmolVLM-500M-Instruct</strong></td>
+                        <td>500M</td>
+                        <td>&lt;1GB</td>
+                        <td>Mobile vision-language tasks</td>
+                        <td><a href="https://huggingface.co/HuggingfaceTB/SmolVLM-500M-Instruct">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gemma 3 Vision 4B</strong></td>
+                        <td>4B</td>
+                        <td>2GB</td>
+                        <td>Multilingual mobile vision</td>
+                        <td><a href="https://huggingface.co/google/gemma-3-4b-vision">Hub</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="specialized">
+            <h2>6. Specialized Models</h2>
+
+            <h3>Image Generation</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Parameters</th>
+                        <th>Best For</th>
+                        <th>License</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>FLUX.1-dev</strong></td>
+                        <td>12B</td>
+                        <td>High-quality generation</td>
+                        <td>Non-Commercial</td>
+                        <td><a href="https://huggingface.co/black-forest-labs/FLUX.1-dev">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Stable Diffusion 3.5</strong></td>
+                        <td>8B</td>
+                        <td>Production use</td>
+                        <td>OpenRAIL</td>
+                        <td><a href="https://huggingface.co/stabilityai/stable-diffusion-3.5">Hub</a></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Code Generation</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Parameters</th>
+                        <th>Best For</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>DeepSeek-Coder 33B</strong></td>
+                        <td>33B</td>
+                        <td>Code completion and generation</td>
+                        <td><a href="https://huggingface.co/deepseek-ai/deepseek-coder-33b">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Codestral-22B</strong></td>
+                        <td>22B</td>
+                        <td>Production code generation</td>
+                        <td><a href="https://huggingface.co/mistralai/Codestral-22B">Hub</a></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Translation</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Parameters</th>
+                        <th>Language Coverage</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>m2m-100</strong></td>
+                        <td>418M</td>
+                        <td>100 languages</td>
+                        <td><a href="https://huggingface.co/facebook/m2m100_418M">Hub</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="selection">
+            <h2>7. Model Selection Guide</h2>
+
+            <div class="decision-tree">
+                <pre>START: What's your primary task?
+
+├── TEXT GENERATION?
+│   ├── General chat/instructions → Llama 3.3 70B
+│   ├── Code generation → DeepSeek-Coder 33B
+│   ├── Lightweight/mobile → Gemma 3 4B
+│   └── Complex reasoning → DeepSeek-R1
+│
+├── SEMANTIC SEARCH / EMBEDDINGS?
+│   ├── Fast, lightweight → all-MiniLM-L6-v2
+│   ├── Best quality → all-mpnet-base-v2
+│   └── Multilingual → multilingual-e5-large
+│
+├── IMAGE CLASSIFICATION?
+│   ├── High accuracy → timm/mvitv2_large
+│   ├── Lightweight → facebook/convnext-tiny
+│   └── Zero-shot → openai/clip-vit-large
+│
+├── VISION-LANGUAGE?
+│   ├── Lightweight → SmolVLM-500M
+│   ├── Production → Llama 3.2 Vision 11B
+│   └── High-quality → Llama 3.2 Vision 90B
+│
+├── AUDIO?
+│   ├── Speech recognition → Whisper Large-v3
+│   ├── Text-to-speech → Kokoro-82M
+│   └── Multilingual audio → MMS
+│
+└── IMAGE GENERATION?
+    ├── High quality → FLUX.1-dev
+    ├── Production → Stable Diffusion 3.5
+    └── Lightweight → SD XL Base</pre>
+            </div>
+
+            <h3>Selection Criteria</h3>
+
+            <div class="specs">
+                <div class="spec-item">
+                    <div class="spec-label">Accuracy / Quality</div>
+                    <div class="spec-value">Check Open LLM Leaderboard, benchmark scores</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Inference Speed</div>
+                    <div class="spec-value">Smaller models typically 1.5-2x faster</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Memory Requirements</div>
+                    <div class="spec-value">Use 4-bit quantization to reduce by 75%</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Deployment Target</div>
+                    <div class="spec-value">Mobile? Edge? Cloud? Affects model choice</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Cost</div>
+                    <div class="spec-value">API pricing, compute infrastructure</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">License</div>
+                    <div class="spec-value">Check commercial use allowances</div>
+                </div>
+            </div>
+
+            <h3>Quick Comparison: When to Choose What</h3>
+
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <h4>For Maximum Quality</h4>
+                    <ul>
+                        <li>Llama 3.3 70B (LLMs)</li>
+                        <li>all-mpnet-base-v2 (Embeddings)</li>
+                        <li>timm/mvitv2_large (Vision)</li>
+                        <li>Whisper Large-v3 (Audio)</li>
+                    </ul>
+                </div>
+
+                <div class="comparison-card">
+                    <h4>For Speed & Efficiency</h4>
+                    <ul>
+                        <li>Gemma 3 4B (LLMs)</li>
+                        <li>all-MiniLM-L6-v2 (Embeddings)</li>
+                        <li>convnext-tiny (Vision)</li>
+                        <li>Whisper Small (Audio)</li>
+                    </ul>
+                </div>
+
+                <div class="comparison-card">
+                    <h4>For Mobile/Edge</h4>
+                    <ul>
+                        <li>Llama 3.2 1B (LLMs)</li>
+                        <li>all-MiniLM-L6-v2 (Embeddings)</li>
+                        <li>SmolVLM-500M (Vision-Language)</li>
+                        <li>Whisper Tiny (Audio)</li>
+                    </ul>
+                </div>
+
+                <div class="comparison-card">
+                    <h4>For Production Enterprise</h4>
+                    <ul>
+                        <li>Llama 3.3 70B (LLMs)</li>
+                        <li>all-mpnet-base-v2 (Embeddings)</li>
+                        <li>Llama 3.2 Vision 11B (Multimodal)</li>
+                        <li>FLUX.1 (Image Gen)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="benchmarks">
+            <h2>8. Benchmarks & Evaluation</h2>
+
+            <h3>Key Leaderboards to Monitor</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Leaderboard</th>
+                        <th>Focus</th>
+                        <th>Key Metrics</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Open LLM Leaderboard</strong></td>
+                        <td>Language models</td>
+                        <td>ARC, HellaSwag, MMLU, TruthfulQA</td>
+                        <td><a href="https://huggingface.co/collections/open-llm-leaderboard">Hub</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>LMSys Chatbot Arena</strong></td>
+                        <td>Chat quality</td>
+                        <td>Human preference ranking</td>
+                        <td><a href="https://arena.lmsys.org">Website</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>MTEB Leaderboard</strong></td>
+                        <td>Embeddings</td>
+                        <td>Retrieval, clustering, similarity</td>
+                        <td><a href="https://huggingface.co/spaces/mteb/leaderboard">Spaces</a></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="note">
+                <strong>Pro Tip:</strong> Don't rely on single benchmarks. Check if a model performs well across multiple leaderboards before adopting it for production.
+            </div>
+        </section>
+
+        <section id="infrastructure">
+            <h2>9. Deployment & Infrastructure</h2>
+
+            <h3>Recommended Inference Solutions</h3>
+
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <h4>Local Inference</h4>
+                    <ul>
+                        <li><strong>Ollama:</strong> One-liner model running</li>
+                        <li><strong>llama.cpp:</strong> CPU-optimized</li>
+                        <li><strong>MLX:</strong> Apple Silicon optimized</li>
+                        <li><strong>vLLM:</strong> High-throughput serving</li>
+                    </ul>
+                </div>
+
+                <div class="comparison-card">
+                    <h4>Cloud Inference APIs</h4>
+                    <ul>
+                        <li><strong>HF Inference API:</strong> Official, integrated</li>
+                        <li><strong>Groq:</strong> Fast inference</li>
+                        <li><strong>Together AI:</strong> Multi-model support</li>
+                        <li><strong>Replicate:</strong> API-first deployment</li>
+                    </ul>
+                </div>
+
+                <div class="comparison-card">
+                    <h4>Quantization Formats</h4>
+                    <ul>
+                        <li><strong>GGUF:</strong> llama.cpp/Ollama</li>
+                        <li><strong>GPTQ:</strong> 4-bit quantization</li>
+                        <li><strong>ONNX:</strong> Cross-platform</li>
+                        <li><strong>4-bit/8-bit:</strong> Native Transformers</li>
+                    </ul>
+                </div>
+
+                <div class="comparison-card">
+                    <h4>Performance Tips</h4>
+                    <ul>
+                        <li>Use 4-bit to save 75% VRAM</li>
+                        <li>Implement batching for throughput</li>
+                        <li>Cache embeddings for repeated queries</li>
+                        <li>Monitor API costs monthly</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Quick Start Examples</h2>
+
+            <div class="note">
+                <strong>Installation:</strong> <code>pip install transformers sentence-transformers</code>
+            </div>
+
+            <h3>Text Generation</h3>
+            <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+from transformers import pipeline
+
+# Use local model or quantized
+pipe = pipeline("text-generation", model="meta-llama/Llama-3.2-1B")
+output = pipe("What is machine learning?", max_length=200)
+            </pre>
+
+            <h3>Semantic Search with Embeddings</h3>
+            <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer('all-MiniLM-L6-v2')
+embeddings = model.encode(["Hello world", "Goodbye world"])
+similarity = model.similarity(embeddings[0], embeddings[1])
+            </pre>
+
+            <h3>Vision-Language Understanding</h3>
+            <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+from transformers import pipeline
+from PIL import Image
+
+# Use lightweight model
+processor = pipeline("image-to-text",
+    model="HuggingfaceTB/SmolVLM-500M-Instruct")
+image = Image.open("image.jpg")
+result = processor(image, "Describe this image")
+            </pre>
+
+            <h3>Speech Recognition</h3>
+            <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+from transformers import pipeline
+
+# Use small model for speed
+transcriber = pipeline("automatic-speech-recognition",
+    model="openai/whisper-small")
+result = transcriber("audio.mp3")
+            </pre>
+        </section>
+
+        <section>
+            <h2>Resources & Links</h2>
+
+            <h3>Official Documentation</h3>
+            <ul style="list-style-position: inside; margin: 1rem 0;">
+                <li><a href="https://huggingface.co">Hugging Face Hub</a> - Browse 2.7M+ models</li>
+                <li><a href="https://huggingface.co/docs/transformers">Transformers Documentation</a> - API reference</li>
+                <li><a href="https://huggingface.co/docs/hub">Hub Documentation</a> - Model cards, datasets</li>
+                <li><a href="https://huggingface.co/spaces">Hugging Face Spaces</a> - Interactive demos</li>
+            </ul>
+
+            <h3>Key Collections & Curations</h3>
+            <ul style="list-style-position: inside; margin: 1rem 0;">
+                <li><a href="https://huggingface.co/collections/open-llm-leaderboard">Open LLM Leaderboard</a> - Best LLMs ranked</li>
+                <li><a href="https://huggingface.co/sentence-transformers/models">Sentence Transformers</a> - Embedding models</li>
+                <li><a href="https://huggingface.co/collections/unsloth/vision-multimodal-models">Vision/Multimodal Collection</a> - VLMs</li>
+            </ul>
+
+            <h3>Community & Updates</h3>
+            <ul style="list-style-position: inside; margin: 1rem 0;">
+                <li><a href="https://huggingface.co/blog">Hugging Face Blog</a> - Model releases, tutorials</li>
+                <li>Check models page weekly for trending new releases</li>
+                <li>Star models you use to track updates</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Conclusion</h2>
+
+            <p>Hugging Face provides an unparalleled ecosystem of AI/ML models. The key to effective model selection:</p>
+
+            <ol style="list-style-position: inside; margin: 1rem 0; line-height: 2;">
+                <li><strong>Define requirements:</strong> accuracy, latency, cost, deployment target</li>
+                <li><strong>Identify task:</strong> Use decision tree above</li>
+                <li><strong>Check benchmarks:</strong> Open LLM Leaderboard, MTEB, etc.</li>
+                <li><strong>Test locally:</strong> Evaluate accuracy vs. inference time</li>
+                <li><strong>Optimize for deployment:</strong> Quantization, caching, batching</li>
+                <li><strong>Monitor & iterate:</strong> Track performance, update regularly</li>
+            </ol>
+
+            <p style="margin-top: 2rem;"><strong>The pace of model release is rapid.</strong> Check leaderboards and collections monthly to ensure you're using the best available options.</p>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Hugging Face Models Comprehensive Guide</p>
+        <p>Last updated: April 2026 | <a href="https://huggingface.co" style="color: #667eea;">Visit Hugging Face Hub</a></p>
+    </footer>
+</body>
+</html>

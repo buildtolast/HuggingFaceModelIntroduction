@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hugging Face Model Selector - Find Your Perfect Model</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .selector-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .selector-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .selector-card h2 {
+            color: #667eea;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        select, input[type="range"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #eee;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        select:focus, input[type="range"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .slider-container {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .slider-value {
+            background: #f0f0f0;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            min-width: 80px;
+            text-align: center;
+            font-weight: 600;
+            color: #667eea;
+        }
+        .constraint-group {
+            margin-bottom: 1.5rem;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        .results-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+        }
+        .results-section.active {
+            display: block;
+        }
+        .results-section h2 {
+            color: #667eea;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+        .recommendation {
+            background: linear-gradient(135deg, #f0f4ff 0%, #f8f1ff 100%);
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .recommendation h3 {
+            color: #667eea;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        .match-score {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .model-details {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #ddd;
+        }
+        .detail-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 1rem;
+            margin: 0.5rem 0;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #764ba2;
+        }
+        .detail-value {
+            color: #333;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.7rem;
+            background: #667eea;
+            color: white;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .badge.pro {
+            background: #4caf50;
+        }
+        .badge.con {
+            background: #ff9800;
+        }
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .pros, .cons {
+            padding: 1rem;
+            border-radius: 6px;
+            background: #f8f9fa;
+        }
+        .pros {
+            border-left: 4px solid #4caf50;
+        }
+        .cons {
+            border-left: 4px solid #ff9800;
+        }
+        .pros h4, .cons h4 {
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        .pros ul, .cons ul {
+            list-style: none;
+            padding-left: 1rem;
+        }
+        .pros li:before {
+            content: "✓ ";
+            color: #4caf50;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        .cons li:before {
+            content: "⚠ ";
+            color: #ff9800;
+            margin-right: 0.5rem;
+        }
+        .alternative-models {
+            margin-top: 2rem;
+        }
+        .alternative-models h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        .model-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #764ba2;
+        }
+        .model-card h4 {
+            color: #764ba2;
+            margin-bottom: 0.5rem;
+        }
+        .model-card p {
+            color: #666;
+            font-size: 0.95rem;
+            margin: 0.25rem 0;
+        }
+        .link-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #ddd;
+        }
+        .link-section a {
+            display: inline-block;
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            background: #f0f0f0;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: background 0.3s;
+        }
+        .link-section a:hover {
+            background: #e0e0e0;
+        }
+        .summary-stats {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .stat-box {
+            padding: 1rem;
+            background: white;
+            border-radius: 4px;
+            border-left: 4px solid #667eea;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+        @media (max-width: 768px) {
+            .selector-grid {
+                grid-template-columns: 1fr;
+            }
+            header h1 {
+                font-size: 1.8rem;
+            }
+            .pros-cons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 Hugging Face Model Selector</h1>
+            <p>Answer a few questions to find your perfect model</p>
+        </header>
+
+        <div class="selector-grid">
+            <!-- Left Column: Questions -->
+            <div class="selector-card">
+                <h2>What Do You Need?</h2>
+
+                <div class="form-group">
+                    <label for="task">1. What's your primary task? *</label>
+                    <select id="task" required>
+                        <option value="">-- Select a task --</option>
+                        <option value="chat">Chat / Conversational AI</option>
+                        <option value="code">Code Generation</option>
+                        <option value="reasoning">Complex Reasoning</option>
+                        <option value="embeddings">Semantic Search / Embeddings</option>
+                        <option value="vision">Image Understanding / Vision</option>
+                        <option value="multimodal">Vision + Text (Image to Text)</option>
+                        <option value="translation">Translation</option>
+                        <option value="summarization">Summarization</option>
+                        <option value="ner">Named Entity Recognition</option>
+                        <option value="classification">Text Classification</option>
+                        <option value="speech">Speech Recognition</option>
+                        <option value="generation">Image Generation</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="priority">2. What's your top priority? *</label>
+                    <select id="priority" required>
+                        <option value="">-- Select priority --</option>
+                        <option value="quality">Maximum Quality</option>
+                        <option value="speed">Speed & Efficiency</option>
+                        <option value="cost">Cost (VRAM/$$)</option>
+                        <option value="balanced">Balanced</option>
+                    </select>
+                </div>
+
+                <div class="constraint-group">
+                    <label style="font-weight: 600; color: #333; margin-bottom: 1rem; display: block;">3. Constraints (Optional)</label>
+
+                    <div class="form-group">
+                        <label for="vram">Maximum VRAM Available (GB)</label>
+                        <div class="slider-container">
+                            <input type="range" id="vram" min="1" max="500" value="24" step="1">
+                            <span class="slider-value"><span id="vramValue">24</span>GB</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="latency">Acceptable Latency (ms)</label>
+                        <div class="slider-container">
+                            <input type="range" id="latency" min="10" max="10000" value="1000" step="100">
+                            <span class="slider-value"><span id="latencyValue">1000</span>ms</span>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="multilingual" value="multilingual">
+                            <label for="multilingual">Must support 100+ languages</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="opensource" value="opensource">
+                            <label for="opensource">Open-source only (no API)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="mobile" value="mobile">
+                            <label for="mobile">Mobile/Edge deployment</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="localonly" value="localonly">
+                            <label for="localonly">Local deployment (no cloud API)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="findModel()">Find My Model</button>
+                    <button class="btn btn-secondary" onclick="resetForm()">Reset</button>
+                </div>
+            </div>
+
+            <!-- Right Column: Quick Tips -->
+            <div class="selector-card">
+                <h2>📋 Quick Tips</h2>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="color: #764ba2; font-size: 1rem; margin-bottom: 0.5rem;">🎯 By Quality Level</h3>
+                    <p style="color: #666; font-size: 0.95rem; margin-bottom: 0.75rem;"><strong>Top Tier:</strong> GPT-4, Claude 3.5, Llama 3.3 70B</p>
+                    <p style="color: #666; font-size: 0.95rem; margin-bottom: 0.75rem;"><strong>Great Value:</strong> Qwen 2.5, Mistral 7B, Gemma 3</p>
+                    <p style="color: #666; font-size: 0.95rem;"><strong>Lightweight:</strong> Phi 3 Mini, Llama 3.2 1B</p>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="color: #764ba2; font-size: 1rem; margin-bottom: 0.5rem;">💡 Best Combinations</h3>
+                    <p style="color: #666; font-size: 0.95rem; margin-bottom: 0.75rem;"><strong>For RAG:</strong> Llama 3.3 70B + all-MiniLM embeddings</p>
+                    <p style="color: #666; font-size: 0.95rem; margin-bottom: 0.75rem;"><strong>For Production:</strong> Quantized Qwen 2.5 + RAG</p>
+                    <p style="color: #666; font-size: 0.95rem;"><strong>For Mobile:</strong> Gemma 3 2B + GGUF quantization</p>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="color: #764ba2; font-size: 1rem; margin-bottom: 0.5rem;">⚡ Performance Tips</h3>
+                    <p style="color: #666; font-size: 0.95rem; margin-bottom: 0.75rem;">✓ Use 4-bit quantization (75% VRAM savings)</p>
+                    <p style="color: #666; font-size: 0.95rem; margin-bottom: 0.75rem;">✓ Cache embeddings for repeated queries</p>
+                    <p style="color: #666; font-size: 0.95rem;">✓ Use RAG over context stuffing</p>
+                </div>
+
+                <div>
+                    <h3 style="color: #764ba2; font-size: 1rem; margin-bottom: 0.5rem;">🔗 Resources</h3>
+                    <a href="models_documentation.html" style="display: inline-block; color: #667eea; text-decoration: none; margin-bottom: 0.5rem;">→ Full Model Guide</a><br>
+                    <a href="models_deep_dive.html" style="display: inline-block; color: #667eea; text-decoration: none; margin-bottom: 0.5rem;">→ Technical Deep Dive</a><br>
+                    <a href="interactive_demos.html" style="display: inline-block; color: #667eea; text-decoration: none;">→ Interactive Demos</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <h2>🎯 Your Recommendation</h2>
+
+            <div class="summary-stats" id="summaryStats"></div>
+
+            <div id="recommendationContainer"></div>
+
+            <div class="alternative-models" id="alternativeModels" style="display: none;">
+                <h3>🔄 Alternative Models to Consider</h3>
+                <div id="alternativesList"></div>
+            </div>
+
+            <button class="btn btn-secondary" onclick="document.getElementById('resultsSection').classList.remove('active'); window.scrollTo(0, 0);" style="margin-top: 2rem;">← Back to Selector</button>
+        </div>
+    </div>
+
+    <script>
+        // Update slider displays
+        document.getElementById('vram').addEventListener('input', (e) => {
+            document.getElementById('vramValue').textContent = e.target.value;
+        });
+
+        document.getElementById('latency').addEventListener('input', (e) => {
+            document.getElementById('latencyValue').textContent = e.target.value;
+        });
+
+        // Model database with complete information
+        const models = {
+            // Chat Models
+            'llama-3.3-70b': {
+                name: 'Llama 3.3 70B Instruct',
+                category: 'LLM - Chat',
+                type: 'closed',
+                quality: 5,
+                speed: 3,
+                vram: 40,
+                latency: 150,
+                cost: 'medium',
+                tasks: ['chat', 'code', 'reasoning', 'classification'],
+                languages: 200,
+                description: 'Best-in-class chat model. Production standard for high-quality applications.',
+                pros: ['Highest quality output', 'Great reasoning', 'Handles complex tasks'],
+                cons: ['Requires 40GB+ VRAM', 'Slower inference', 'Closed-source weights'],
+                link: 'https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct',
+                downloads: '45M/month'
+            },
+            'qwen-2.5-7b': {
+                name: 'Qwen 2.5 7B Instruct',
+                category: 'LLM - Chat',
+                type: 'open',
+                quality: 4,
+                speed: 4,
+                vram: 4,
+                latency: 50,
+                cost: 'low',
+                tasks: ['chat', 'code', 'classification', 'translation'],
+                languages: 90,
+                description: 'Excellent value. Fast, efficient, multilingual. Best for cost-conscious production.',
+                pros: ['Only 4GB VRAM', 'Fast inference', 'Good multilingual'],
+                cons: ['Slightly lower quality than 70B', 'Limited reasoning on complex tasks'],
+                link: 'https://huggingface.co/Qwen/Qwen2.5-7B',
+                downloads: '12M/month'
+            },
+            'mistral-7b': {
+                name: 'Mistral 7B Instruct',
+                category: 'LLM - Chat',
+                type: 'open',
+                quality: 4,
+                speed: 5,
+                vram: 4,
+                latency: 40,
+                cost: 'low',
+                tasks: ['chat', 'code', 'classification'],
+                languages: 80,
+                description: 'Fastest 7B model. Perfect for real-time applications. Slightly smaller context window.',
+                pros: ['Fastest inference', 'Optimized for edge', 'Easy to quantize'],
+                cons: ['32K context only', 'Less multilingual than Qwen', 'Smaller context'],
+                link: 'https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2',
+                downloads: '8M/month'
+            },
+            'gemma-3-4b': {
+                name: 'Gemma 3 4B Instruct',
+                category: 'LLM - Chat',
+                type: 'open',
+                quality: 3,
+                speed: 5,
+                vram: 2,
+                latency: 30,
+                cost: 'low',
+                tasks: ['chat', 'classification'],
+                languages: 100,
+                description: 'Lightweight model for mobile and edge. Multimodal capable.',
+                pros: ['Only 2GB VRAM', 'Mobile-ready', 'Has vision variant'],
+                cons: ['Lower quality than 7B', 'Limited reasoning', 'Fewer tasks'],
+                link: 'https://huggingface.co/google/gemma-3-4b-it',
+                downloads: '5M/month'
+            },
+            'deepseek-r1': {
+                name: 'DeepSeek-R1',
+                category: 'LLM - Reasoning',
+                type: 'open',
+                quality: 5,
+                speed: 1,
+                vram: 370,
+                latency: 5000,
+                cost: 'high',
+                tasks: ['reasoning', 'code', 'math'],
+                languages: 50,
+                description: 'Latest reasoning breakthrough. Slower but exceptional on complex problems.',
+                pros: ['Best for reasoning tasks', 'Excellent on benchmarks', 'Open weights'],
+                cons: ['Very slow (chain-of-thought)', 'Requires 370GB VRAM', 'Expensive to run'],
+                link: 'https://huggingface.co/deepseek-ai/DeepSeek-R1',
+                downloads: '2M/month'
+            },
+            // Code Models
+            'deepseek-coder-33b': {
+                name: 'DeepSeek-Coder 33B',
+                category: 'LLM - Code',
+                type: 'open',
+                quality: 5,
+                speed: 2,
+                vram: 18,
+                latency: 200,
+                cost: 'medium',
+                tasks: ['code'],
+                languages: 10,
+                description: 'Best open-source code generation model. Supports 86 programming languages.',
+                pros: ['Specialized for code', '86 languages', 'Good quality'],
+                cons: ['Larger model', 'Not good for chat', 'Medium VRAM'],
+                link: 'https://huggingface.co/deepseek-ai/deepseek-coder-33b',
+                downloads: '1.2M/month'
+            },
+            // Embeddings
+            'minilm-embeddings': {
+                name: 'all-MiniLM-L6-v2',
+                category: 'Embeddings',
+                type: 'open',
+                quality: 4,
+                speed: 5,
+                vram: 0.5,
+                latency: 5,
+                cost: 'low',
+                tasks: ['embeddings'],
+                languages: 200,
+                description: 'Most popular embedding model. Fast, lightweight, excellent for RAG.',
+                pros: ['207M downloads/month (!)', 'Super fast', 'Works everywhere'],
+                cons: ['Lower quality than mpnet', '384 dims only', 'Limited semantic richness'],
+                link: 'https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2',
+                downloads: '207M/month (!)'
+            },
+            'mpnet-embeddings': {
+                name: 'all-mpnet-base-v2',
+                category: 'Embeddings',
+                type: 'open',
+                quality: 5,
+                speed: 4,
+                vram: 1,
+                latency: 10,
+                cost: 'low',
+                tasks: ['embeddings'],
+                languages: 200,
+                description: 'High-quality embeddings. Better than MiniLM but slower.',
+                pros: ['Best embedding quality', 'Still fast', 'Good semantic'],
+                cons: ['Larger than MiniLM', 'More VRAM', 'Slightly slower'],
+                link: 'https://huggingface.co/sentence-transformers/all-mpnet-base-v2',
+                downloads: '28M/month'
+            },
+            // Vision Models
+            'llama-vision-11b': {
+                name: 'Llama 3.2 Vision 11B',
+                category: 'Vision-Language',
+                type: 'open',
+                quality: 4,
+                speed: 3,
+                vram: 6,
+                latency: 100,
+                cost: 'low',
+                tasks: ['vision', 'multimodal', 'chat'],
+                languages: 100,
+                description: 'Lightweight vision model. Great for image understanding tasks.',
+                pros: ['Only 6GB VRAM', 'Good image understanding', 'Multilingual'],
+                cons: ['Smaller than 90B version', 'Limited reasoning on images', '128K context'],
+                link: 'https://huggingface.co/meta-llama/Llama-3.2-11B-Vision',
+                downloads: '3M/month'
+            },
+            'clip-vit': {
+                name: 'CLIP ViT-Large-14',
+                category: 'Vision',
+                type: 'open',
+                quality: 4,
+                speed: 4,
+                vram: 1,
+                latency: 20,
+                cost: 'low',
+                tasks: ['vision', 'embeddings'],
+                languages: 0,
+                description: 'Image-text matching. Excellent for zero-shot image classification.',
+                pros: ['Fast', 'Light', 'Works without training', 'Bilingual'],
+                cons: ['Not for detailed descriptions', 'Limited to 400x400 images'],
+                link: 'https://huggingface.co/openai/clip-vit-large-patch14',
+                downloads: '2.1M/month'
+            },
+            // Audio Models
+            'whisper-large': {
+                name: 'Whisper Large-v3',
+                category: 'Audio',
+                type: 'open',
+                quality: 5,
+                speed: 2,
+                vram: 2,
+                latency: 500,
+                cost: 'low',
+                tasks: ['speech'],
+                languages: 96,
+                description: 'Industry-standard speech recognition. Supports 96 languages with punctuation.',
+                pros: ['Best ASR quality', '96 languages', 'Multilingual'],
+                cons: ['Slower than smaller models', 'Large file size', 'Sequential processing'],
+                link: 'https://huggingface.co/openai/whisper-large-v3',
+                downloads: '1.55M/month'
+            },
+            // Commercial Models
+            'gpt4': {
+                name: 'GPT-4 Turbo',
+                category: 'Commercial - Text',
+                type: 'closed',
+                quality: 5,
+                speed: 3,
+                vram: 0,
+                latency: 500,
+                cost: 'high',
+                tasks: ['chat', 'code', 'reasoning', 'embeddings'],
+                languages: 150,
+                description: '1.7 trillion parameters. Best overall model. API-only access.',
+                pros: ['Highest quality', 'Best reasoning', 'All tasks', 'Vision support'],
+                cons: ['Expensive ($20+/1M tokens)', 'API dependent', 'Closed', 'No local access'],
+                link: 'https://openai.com/gpt-4',
+                downloads: 'API only'
+            },
+            'gpt4-omni': {
+                name: 'GPT-4 Omni',
+                category: 'Commercial - Multimodal',
+                type: 'closed',
+                quality: 5,
+                speed: 4,
+                vram: 0,
+                latency: 300,
+                cost: 'high',
+                tasks: ['chat', 'code', 'reasoning', 'vision', 'multimodal'],
+                languages: 150,
+                description: '1.7T params. Native multimodal (text, image, video, audio).',
+                pros: ['Native multimodal', 'Faster than GPT-4T', 'Better cost', 'All tasks'],
+                cons: ['Expensive', 'API only', 'Closed', 'Not available locally'],
+                link: 'https://openai.com/gpt-4-omni',
+                downloads: 'API only'
+            },
+            'claude-3.5': {
+                name: 'Claude 3.5 Sonnet',
+                category: 'Commercial - Advanced',
+                type: 'closed',
+                quality: 5,
+                speed: 4,
+                vram: 0,
+                latency: 400,
+                cost: 'high',
+                tasks: ['chat', 'code', 'reasoning', 'analysis'],
+                languages: 100,
+                description: 'Latest Claude. 2-3T parameters estimated. Constitutional AI approach.',
+                pros: ['Better reasoning than GPT-4T', 'Less hallucination', 'Good code', 'Large context (200K)'],
+                cons: ['Expensive ($3-15/1M)', 'API only', 'Closed', 'No local access'],
+                link: 'https://www.anthropic.com',
+                downloads: 'API only'
+            },
+            'opus-4.6': {
+                name: 'Opus 4.6',
+                category: 'Commercial - Advanced',
+                type: 'closed',
+                quality: 5,
+                speed: 2,
+                vram: 0,
+                latency: 800,
+                cost: 'very-high',
+                tasks: ['chat', 'code', 'reasoning', 'analysis', 'research'],
+                languages: 120,
+                description: '~1.2-1.5 trillion parameters. Deepest reasoning. Premium tier.',
+                pros: ['Best reasoning', 'Complex analysis', 'Research-grade', 'Extended context'],
+                cons: ['Very expensive ($15+/1M)', 'Slowest', 'API only', 'No local option'],
+                link: 'https://www.anthropic.com',
+                downloads: 'API only'
+            },
+            'gemini-2.0': {
+                name: 'Gemini 2.0 Pro',
+                category: 'Commercial - Multimodal',
+                type: 'closed',
+                quality: 4,
+                speed: 4,
+                vram: 0,
+                latency: 400,
+                cost: 'high',
+                tasks: ['chat', 'code', 'multimodal', 'vision'],
+                languages: 140,
+                description: '1.9 trillion parameters. Native multimodal. 1M context window.',
+                pros: ['1M context', 'Multimodal', 'Fast', 'Good cost'],
+                cons: ['Closed API', 'Expensive', 'No local', 'Less proven than GPT-4'],
+                link: 'https://deepmind.google.com/gemini',
+                downloads: 'API only'
+            }
+        };
+
+        function findModel() {
+            const task = document.getElementById('task').value;
+            const priority = document.getElementById('priority').value;
+            const maxVram = parseInt(document.getElementById('vram').value);
+            const maxLatency = parseInt(document.getElementById('latency').value);
+            const multilingual = document.getElementById('multilingual').checked;
+            const opensource = document.getElementById('opensource').checked;
+            const mobile = document.getElementById('mobile').checked;
+            const localonly = document.getElementById('localonly').checked;
+
+            if (!task || !priority) {
+                alert('Please select task and priority');
+                return;
+            }
+
+            let scored = [];
+
+            for (const [key, model] of Object.entries(models)) {
+                let score = 0;
+                let reasons = [];
+
+                // Task match
+                if (model.tasks.includes(task)) {
+                    score += 30;
+                    reasons.push('Perfect for your task');
+                } else {
+                    continue; // Skip models that don't match task
+                }
+
+                // Priority match
+                if (priority === 'quality' && model.quality >= 4) {
+                    score += 25;
+                } else if (priority === 'speed' && model.speed >= 4) {
+                    score += 25;
+                } else if (priority === 'cost' && model.cost !== 'very-high') {
+                    score += 25;
+                } else if (priority === 'balanced') {
+                    score += Math.min(model.quality, model.speed) * 5;
+                }
+
+                // Constraints
+                if (model.vram <= maxVram) {
+                    score += 20;
+                } else {
+                    score -= 50; // Penalize heavily if exceeds VRAM
+                }
+
+                if (model.latency <= maxLatency) {
+                    score += 15;
+                } else {
+                    score -= 30;
+                }
+
+                // Preferences
+                if (multilingual && model.languages >= 100) {
+                    score += 10;
+                }
+                if (opensource && model.type !== 'closed') {
+                    score += 10;
+                } else if (opensource && model.type === 'closed') {
+                    score -= 50;
+                }
+                if (mobile && model.vram <= 4) {
+                    score += 10;
+                } else if (mobile && model.vram > 24) {
+                    score -= 30;
+                }
+                if (localonly && model.type === 'closed') {
+                    score -= 100;
+                }
+
+                scored.push({ key, model, score, reasons });
+            }
+
+            scored.sort((a, b) => b.score - a.score);
+
+            if (scored.length === 0) {
+                alert('No models match your constraints. Try relaxing some filters.');
+                return;
+            }
+
+            displayResults(scored);
+        }
+
+        function displayResults(scored) {
+            const top = scored[0];
+            const alternatives = scored.slice(1, 4);
+
+            // Summary stats
+            const statsHtml = `
+                <div class="stat-box">
+                    <div class="stat-label">Task</div>
+                    <div class="stat-value">${document.getElementById('task').options[document.getElementById('task').selectedIndex].text}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Match Score</div>
+                    <div class="stat-value">${Math.round(top.score)}%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Est. VRAM</div>
+                    <div class="stat-value">${top.model.vram}GB</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Latency</div>
+                    <div class="stat-value">${top.model.latency}ms</div>
+                </div>
+            `;
+            document.getElementById('summaryStats').innerHTML = statsHtml;
+
+            // Main recommendation
+            const recHtml = `
+                <div class="recommendation">
+                    <h3>${top.model.name}
+                        <span class="match-score" style="margin-left: 1rem;">${Math.round(top.score)}% Match</span>
+                    </h3>
+                    <p style="color: #666; margin: 0.5rem 0;">${top.model.description}</p>
+
+                    <div class="model-details">
+                        <div class="detail-row">
+                            <div class="detail-label">Category:</div>
+                            <div class="detail-value">${top.model.category}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Quality:</div>
+                            <div class="detail-value">${'⭐'.repeat(top.model.quality)}${'☆'.repeat(5-top.model.quality)}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Speed:</div>
+                            <div class="detail-value">${'⚡'.repeat(top.model.speed)}${'◯'.repeat(5-top.model.speed)}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">VRAM Required:</div>
+                            <div class="detail-value">${top.model.vram}GB</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Latency:</div>
+                            <div class="detail-value">${top.model.latency}ms per token</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Languages:</div>
+                            <div class="detail-value">${top.model.languages} languages</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Type:</div>
+                            <div class="detail-value"><span class="badge">${top.model.type.toUpperCase()}</span></div>
+                        </div>
+                        ${top.model.downloads !== 'API only' ? `<div class="detail-row">
+                            <div class="detail-label">Popularity:</div>
+                            <div class="detail-value">${top.model.downloads}</div>
+                        </div>` : ''}
+                    </div>
+
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <h4>✅ Strengths</h4>
+                            <ul>
+                                ${top.model.pros.map(p => `<li>${p}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="cons">
+                            <h4>⚠️ Limitations</h4>
+                            <ul>
+                                ${top.model.cons.map(c => `<li>${c}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="link-section">
+                        <a href="${top.model.link}" target="_blank">🔗 View on Hugging Face</a>
+                        <a href="interactive_demos.html">💻 Try Interactive Demo</a>
+                        ${top.model.type !== 'closed' ? '<a href="HUGGING_FACE_TRAINING_GUIDE.md">📚 Fine-tuning Guide</a>' : ''}
+                    </div>
+                </div>
+            `;
+            document.getElementById('recommendationContainer').innerHTML = recHtml;
+
+            // Alternatives
+            if (alternatives.length > 0) {
+                let altHtml = '';
+                alternatives.forEach((alt, i) => {
+                    altHtml += `
+                        <div class="model-card">
+                            <h4>${i+2}. ${alt.model.name} (${Math.round(alt.score)}% match)</h4>
+                            <p>${alt.model.description}</p>
+                            <p><strong>VRAM:</strong> ${alt.model.vram}GB | <strong>Speed:</strong> ${alt.model.latency}ms | <strong>Quality:</strong> ${'⭐'.repeat(alt.model.quality)}</p>
+                        </div>
+                    `;
+                });
+                document.getElementById('alternativesList').innerHTML = altHtml;
+                document.getElementById('alternativeModels').style.display = 'block';
+            }
+
+            document.getElementById('resultsSection').classList.add('active');
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetForm() {
+            document.querySelectorAll('select').forEach(s => s.value = '');
+            document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+            document.getElementById('vram').value = 24;
+            document.getElementById('latency').value = 1000;
+            document.getElementById('vramValue').textContent = '24';
+            document.getElementById('latencyValue').textContent = '1000';
+            document.getElementById('resultsSection').classList.remove('active');
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
