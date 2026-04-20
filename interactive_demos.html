@@ -317,6 +317,7 @@
         <a href="training_guide.html" style="color:#fff;text-decoration:none;margin:0 0.4rem;padding:0.3rem 0.6rem;">🚀 Training</a>
         <a href="advanced_topics.html" style="color:#fff;text-decoration:none;margin:0 0.4rem;padding:0.3rem 0.6rem;">⚡ Advanced</a>
     </nav>
+    <main>
     <header>
         <h1>🎮 Hugging Face Models - Interactive Demos</h1>
         <p>Try different models and parameters in real-time</p>
@@ -440,6 +441,10 @@
                 <strong>What are embeddings?</strong> Convert text into vectors for semantic search, clustering, and similarity tasks.
             </div>
 
+            <div role="note" style="background:#fff3cd;border-left:4px solid #ff9800;padding:0.6rem 1rem;margin:1rem 0;font-size:0.88rem;color:#333;">
+                <strong>⚠️ Simulation notice:</strong> This demo approximates similarity with a client-side bag-of-words cosine score. Real transformer embeddings (384–1024 dimensions) capture semantic meaning beyond token overlap.
+            </div>
+
             <div class="demo-card">
                 <h3>Semantic Similarity Checker</h3>
 
@@ -550,6 +555,10 @@
 
             <div class="note">
                 <strong>Zero-shot classification:</strong> Classify text into categories without training on those exact categories.
+            </div>
+
+            <div role="note" style="background:#fff3cd;border-left:4px solid #ff9800;padding:0.6rem 1rem;margin:1rem 0;font-size:0.88rem;color:#333;">
+                <strong>⚠️ Simulation notice:</strong> This demo scores labels with simple keyword overlap. Production zero-shot models (e.g., BART-MNLI) use an NLI classifier over the full sentence and understand negation, context, and paraphrasing.
             </div>
 
             <div class="demo-card">
@@ -845,6 +854,7 @@ model.save_pretrained("my-finetuned-model")  # ~50MB instead of 14GB!
         <p>&copy; 2026 Hugging Face Models Interactive Demos</p>
         <p>Navigate between demos above to explore different concepts</p>
     </footer>
+    </main>
 
     <script>
         // Tab navigation
