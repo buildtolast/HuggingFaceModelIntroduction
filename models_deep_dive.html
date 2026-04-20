@@ -1228,24 +1228,24 @@ from transformers import AutoModelForCausalLM
 import torch
 
 model = AutoModelForCausalLM.from_pretrained(
-    "meta-llama/Llama-2-7b",
+    "meta-llama/Llama-3.1-8B",
     load_in_8bit=True,  # Automatic quantization
     device_map="auto"
 )
-# Uses ~7GB VRAM automatically
+# Uses ~8GB VRAM automatically
 
 # Using GPTQ (pre-quantized weights)
 from transformers import AutoModelForCausalLM
 
 model = AutoModelForCausalLM.from_pretrained(
-    "TheBloke/Llama-2-7B-GPTQ",  # GPTQ version
+    "hugging-quants/Meta-Llama-3.1-8B-Instruct-GPTQ-INT4",
     device_map="auto"
 )
-# Fast loading, 3.5GB VRAM
+# Fast loading, ~4GB VRAM
 
 # Using GGUF (Ollama)
-$ ollama pull llama2:7b-q4_K_M
-$ ollama run llama2:7b
+$ ollama pull llama3.1:8b-instruct-q4_K_M
+$ ollama run llama3.1:8b
 # CPU-friendly, can run on Mac
             </div>
 

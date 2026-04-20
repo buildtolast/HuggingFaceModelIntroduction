@@ -467,6 +467,16 @@
     </div>
 
     <script>
+        // Defense-in-depth: escape any value before splicing into innerHTML templates.
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         // Update slider displays
         document.getElementById('vram').addEventListener('input', (e) => {
             document.getElementById('vramValue').textContent = e.target.value;
@@ -847,10 +857,12 @@
             const alternatives = scored.slice(1, 4);
 
             // Summary stats
+            const taskSelect = document.getElementById('task');
+            const taskLabel = taskSelect.options[taskSelect.selectedIndex].text;
             const statsHtml = `
                 <div class="stat-box">
                     <div class="stat-label">Task</div>
-                    <div class="stat-value">${document.getElementById('task').options[document.getElementById('task').selectedIndex].text}</div>
+                    <div class="stat-value">${escapeHtml(taskLabel)}</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-label">Match Score</div>
@@ -858,27 +870,28 @@
                 </div>
                 <div class="stat-box">
                     <div class="stat-label">Est. VRAM</div>
-                    <div class="stat-value">${top.model.vram}GB</div>
+                    <div class="stat-value">${escapeHtml(top.model.vram)}GB</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-label">Latency</div>
-                    <div class="stat-value">${top.model.latency}ms</div>
+                    <div class="stat-value">${escapeHtml(top.model.latency)}ms</div>
                 </div>
             `;
             document.getElementById('summaryStats').innerHTML = statsHtml;
 
             // Main recommendation
+            const isSafeLink = typeof top.model.link === 'string' && /^https?:\/\//i.test(top.model.link);
             const recHtml = `
                 <div class="recommendation">
-                    <h3>${top.model.name}
+                    <h3>${escapeHtml(top.model.name)}
                         <span class="match-score" style="margin-left: 1rem;">${Math.round(top.score)}% Match</span>
                     </h3>
-                    <p style="color: #666; margin: 0.5rem 0;">${top.model.description}</p>
+                    <p style="color: #666; margin: 0.5rem 0;">${escapeHtml(top.model.description)}</p>
 
                     <div class="model-details">
                         <div class="detail-row">
                             <div class="detail-label">Category:</div>
-                            <div class="detail-value">${top.model.category}</div>
+                            <div class="detail-value">${escapeHtml(top.model.category)}</div>
                         </div>
                         <div class="detail-row">
                             <div class="detail-label">Quality:</div>
@@ -890,23 +903,23 @@
                         </div>
                         <div class="detail-row">
                             <div class="detail-label">VRAM Required:</div>
-                            <div class="detail-value">${top.model.vram}GB</div>
+                            <div class="detail-value">${escapeHtml(top.model.vram)}GB</div>
                         </div>
                         <div class="detail-row">
                             <div class="detail-label">Latency:</div>
-                            <div class="detail-value">${top.model.latency}ms per token</div>
+                            <div class="detail-value">${escapeHtml(top.model.latency)}ms per token</div>
                         </div>
                         <div class="detail-row">
                             <div class="detail-label">Languages:</div>
-                            <div class="detail-value">${top.model.languages} languages</div>
+                            <div class="detail-value">${escapeHtml(top.model.languages)} languages</div>
                         </div>
                         <div class="detail-row">
                             <div class="detail-label">Type:</div>
-                            <div class="detail-value"><span class="badge">${top.model.type.toUpperCase()}</span></div>
+                            <div class="detail-value"><span class="badge">${escapeHtml(String(top.model.type).toUpperCase())}</span></div>
                         </div>
                         ${top.model.downloads !== 'API only' ? `<div class="detail-row">
                             <div class="detail-label">Popularity:</div>
-                            <div class="detail-value">${top.model.downloads}</div>
+                            <div class="detail-value">${escapeHtml(top.model.downloads)}</div>
                         </div>` : ''}
                     </div>
 
@@ -914,21 +927,21 @@
                         <div class="pros">
                             <h4>✅ Strengths</h4>
                             <ul>
-                                ${top.model.pros.map(p => `<li>${p}</li>`).join('')}
+                                ${top.model.pros.map(p => `<li>${escapeHtml(p)}</li>`).join('')}
                             </ul>
                         </div>
                         <div class="cons">
                             <h4>⚠️ Limitations</h4>
                             <ul>
-                                ${top.model.cons.map(c => `<li>${c}</li>`).join('')}
+                                ${top.model.cons.map(c => `<li>${escapeHtml(c)}</li>`).join('')}
                             </ul>
                         </div>
                     </div>
 
                     <div class="link-section">
-                        <a href="${top.model.link}" target="_blank">🔗 View on Hugging Face</a>
+                        ${isSafeLink ? `<a href="${escapeHtml(top.model.link)}" target="_blank" rel="noopener noreferrer">🔗 View on Hugging Face</a>` : ''}
                         <a href="interactive_demos.html">💻 Try Interactive Demo</a>
-                        ${top.model.type !== 'closed' ? '<a href="HUGGING_FACE_TRAINING_GUIDE.md">📚 Fine-tuning Guide</a>' : ''}
+                        ${top.model.type !== 'closed' ? '<a href="training_guide.html">📚 Fine-tuning Guide</a>' : ''}
                     </div>
                 </div>
             `;
@@ -940,9 +953,9 @@
                 alternatives.forEach((alt, i) => {
                     altHtml += `
                         <div class="model-card">
-                            <h4>${i+2}. ${alt.model.name} (${Math.round(alt.score)}% match)</h4>
-                            <p>${alt.model.description}</p>
-                            <p><strong>VRAM:</strong> ${alt.model.vram}GB | <strong>Speed:</strong> ${alt.model.latency}ms | <strong>Quality:</strong> ${'⭐'.repeat(alt.model.quality)}</p>
+                            <h4>${i+2}. ${escapeHtml(alt.model.name)} (${Math.round(alt.score)}% match)</h4>
+                            <p>${escapeHtml(alt.model.description)}</p>
+                            <p><strong>VRAM:</strong> ${escapeHtml(alt.model.vram)}GB | <strong>Speed:</strong> ${escapeHtml(alt.model.latency)}ms | <strong>Quality:</strong> ${'⭐'.repeat(alt.model.quality)}</p>
                         </div>
                     `;
                 });

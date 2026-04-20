@@ -781,7 +781,7 @@
                 <h3 style="margin-top: 2rem;">Training Flow Example (QLoRA)</h3>
                 <div class="code-block">
 # 1. Load base model (quantized)
-model = load_quantized_model("meta-llama/Llama-2-7b")
+model = load_quantized_model("meta-llama/Llama-3.1-8B")
 
 # 2. Add LoRA adapters (1.6M params)
 lora_config = LoraConfig(r=8, lora_alpha=16, target_modules=["q_proj", "v_proj"])
@@ -891,7 +891,35 @@ model.save_pretrained("my-finetuned-model")  # ~50MB instead of 14GB!
             document.getElementById('genOutput').classList.remove('show');
         }
 
-        // Embeddings
+        // Embeddings — browser-side approximation using bag-of-words cosine similarity.
+        // A real transformer encoder produces 384–1024 dim vectors; here we simulate with token overlap.
+        function tokenize(text) {
+            return text.toLowerCase()
+                .replace(/[^a-z0-9\s]/g, ' ')
+                .split(/\s+/)
+                .filter(Boolean);
+        }
+
+        function bagOfWordsVector(tokens, vocab) {
+            const vec = new Array(vocab.length).fill(0);
+            tokens.forEach(t => {
+                const i = vocab.indexOf(t);
+                if (i >= 0) vec[i] += 1;
+            });
+            return vec;
+        }
+
+        function cosineSim(a, b) {
+            let dot = 0, na = 0, nb = 0;
+            for (let i = 0; i < a.length; i++) {
+                dot += a[i] * b[i];
+                na += a[i] * a[i];
+                nb += b[i] * b[i];
+            }
+            if (na === 0 || nb === 0) return 0;
+            return dot / (Math.sqrt(na) * Math.sqrt(nb));
+        }
+
         function computeSimilarity() {
             const text1 = document.getElementById('text1').value;
             const text2 = document.getElementById('text2').value;
@@ -902,16 +930,18 @@ model.save_pretrained("my-finetuned-model")  # ~50MB instead of 14GB!
                 return;
             }
 
-            let similarity = 0.87;
-            let interpretation = "Highly similar - same semantic meaning";
+            const t1 = tokenize(text1);
+            const t2 = tokenize(text2);
+            const vocab = Array.from(new Set([...t1, ...t2]));
+            const v1 = bagOfWordsVector(t1, vocab);
+            const v2 = bagOfWordsVector(t2, vocab);
+            const similarity = cosineSim(v1, v2);
 
-            const similarity_score = Math.abs(text1.length - text2.length) / Math.max(text1.length, text2.length);
-            similarity = Math.max(0.3, 1 - similarity_score * 0.5);
-
-            if (similarity > 0.8) interpretation = "Highly similar - equivalent meaning";
-            else if (similarity > 0.6) interpretation = "Similar - related concepts";
-            else if (similarity > 0.4) interpretation = "Somewhat similar - some overlap";
-            else interpretation = "Different - distinct meanings";
+            let interpretation;
+            if (similarity > 0.8) interpretation = "Highly similar - near-identical wording";
+            else if (similarity > 0.5) interpretation = "Similar - substantial overlap";
+            else if (similarity > 0.2) interpretation = "Somewhat similar - partial overlap";
+            else interpretation = "Different - little lexical overlap";
 
             const dims = model === 'e5' ? 1024 : model === 'mpnet' ? 768 : 384;
 
@@ -923,29 +953,41 @@ model.save_pretrained("my-finetuned-model")  # ~50MB instead of 14GB!
             document.getElementById('similarityOutput').classList.add('show');
         }
 
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         // Classification
         function classifyText() {
-            const text = document.getElementById('classify-text').value;
-            const labels = document.getElementById('classify-labels').value.split(',').map(l => l.trim());
+            const labels = document.getElementById('classify-labels').value.split(',').map(l => l.trim()).filter(Boolean);
 
-            let html = '<div style="padding: 1rem;">';
+            const container = document.getElementById('classifyContent');
+            container.innerHTML = '';
+            const wrap = document.createElement('div');
+            wrap.style.padding = '1rem';
+
             labels.forEach((label, i) => {
                 const score = (Math.random() * 0.3 + (i === 0 ? 0.7 : 0.2)).toFixed(2);
-                html += `
-                    <div style="margin-bottom: 1rem;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-                            <strong>${label}</strong>
-                            <span style="color: #667eea; font-weight: 600;">${score}</span>
-                        </div>
-                        <div style="background: #f0f0f0; height: 8px; border-radius: 4px; overflow: hidden;">
-                            <div style="background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; width: ${score * 100}%;"></div>
-                        </div>
+                const row = document.createElement('div');
+                row.style.marginBottom = '1rem';
+                row.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                        <strong>${escapeHtml(label)}</strong>
+                        <span style="color: #667eea; font-weight: 600;">${escapeHtml(score)}</span>
+                    </div>
+                    <div style="background: #f0f0f0; height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div style="background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; width: ${Number(score) * 100}%;"></div>
                     </div>
                 `;
+                wrap.appendChild(row);
             });
-            html += '</div>';
 
-            document.getElementById('classifyContent').innerHTML = html;
+            container.appendChild(wrap);
             document.getElementById('classifyOutput').classList.add('show');
         }
 

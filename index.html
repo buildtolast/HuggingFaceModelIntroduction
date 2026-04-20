@@ -634,6 +634,61 @@
             </div>
         </div>
 
+        <div class="faq-section" style="background: linear-gradient(135deg, #fff5f0 0%, #fffaf0 100%); border-left: 4px solid #f59e0b;">
+            <h2 style="color: #b45309;">📖 Glossary: 12 Terms to Know</h2>
+            <p style="color: #666; margin-bottom: 1rem;">Every term below appears across the guides. Skim this once and the rest will click faster.</p>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <div class="faq-question">Token</div>
+                    <div class="faq-answer">A chunk of text the model processes as one unit — usually a word, subword, or punctuation mark. "Fine-tuning" ≈ 3 tokens. Think of tokens as Lego bricks: models build sentences from ~50,000 prefab bricks, not individual letters.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Tokenization</div>
+                    <div class="faq-answer">The step that turns your text into a list of token IDs before the model sees it. Different models use different tokenizers — "strawberry" might be 1 token in GPT-4 and 3 tokens in Llama 2. Why you sometimes see models "miscount letters."</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Context window</div>
+                    <div class="faq-answer">The maximum number of tokens the model can "see" at once — prompt + response combined. Like a whiteboard: 128k tokens ≈ 300 pages. Once full, oldest content falls off. Longer windows cost more and run slower.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Attention</div>
+                    <div class="faq-answer">The mechanism that lets each token "look at" every other token to decide what's relevant. Analogy: when reading a pronoun, attention is how the model links it back to the noun it refers to. Scales O(n²) with context length — hence why long contexts are expensive.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Parameters (weights)</div>
+                    <div class="faq-answer">The learnable numbers inside the model — "7B" means 7 billion of them. More parameters = more capacity but also more memory, latency, and training cost. Rule of thumb: bytes = params × precision (FP16 = 2 bytes/param, so 7B × 2 = 14GB).</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Temperature</div>
+                    <div class="faq-answer">A knob (0.0–2.0) that controls randomness. 0 = always pick the single most likely next token (deterministic, boring). 1.0 = sample from the model's natural distribution. 2.0 = chaotic. Use 0.2 for code, 0.7 for chat, 1.0 for brainstorming.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Top-p (nucleus sampling)</div>
+                    <div class="faq-answer">Restrict sampling to the smallest set of tokens whose probabilities add up to <em>p</em> (e.g., 0.9). Prevents picking weird low-probability tokens even at high temperature. Usually set to 0.9 and left alone.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Quantization</div>
+                    <div class="faq-answer">Compressing the model's weights to use fewer bits per number — FP16 → INT8 → 4-bit. Analogy: like saving a photo as JPEG instead of PNG. File is smaller, quality dips slightly (5–10% for 4-bit), but it still runs. Makes 70B models fit on consumer GPUs.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Fine-tuning</div>
+                    <div class="faq-answer">Continuing to train a pre-trained model on your own data so it specializes. Like taking a med-school graduate and giving them a cardiology residency — they keep general knowledge but get domain-specific skills.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">LoRA (Low-Rank Adaptation)</div>
+                    <div class="faq-answer">A fine-tuning trick: instead of updating all 7B parameters, add small "adapter" matrices (0.02% as many params) and only train those. 75% less VRAM, training in hours not days, result is portable (50MB file). Near-full-FT quality for most tasks.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">QLoRA</div>
+                    <div class="faq-answer">LoRA + 4-bit quantization. Loads the base model in 4-bit (tiny memory footprint), trains tiny LoRA adapters on top. How you fine-tune an 8B model on a free Colab T4 or a 70B on a single A100. The 2026 default for most teams.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Embedding</div>
+                    <div class="faq-answer">A fixed-size vector (e.g., 384 or 1024 numbers) that represents the meaning of text. Similar meanings → similar vectors. Used for semantic search, clustering, and RAG. Produced by a different kind of model than chat — e.g., <code>all-MiniLM-L6-v2</code>.</div>
+                </div>
+            </div>
+        </div>
+
         <div class="recommended-path">
             <strong>🎯 First-Time Visitor Recommended Path:</strong>
             <ol style="margin: 1rem 0; padding-left: 1.5rem; color: #333;">
