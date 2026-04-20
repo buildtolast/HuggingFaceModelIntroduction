@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Topics - RAG, Agents, Deployment, Reasoning Models</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        header p { font-size: 1.1rem; opacity: 0.9; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        nav.page-nav {
+            background: white;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 50px;
+            z-index: 99;
+            overflow-x: auto;
+        }
+        nav.page-nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        nav.page-nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+        nav.page-nav a:hover { background: #f0f0f0; }
+        section {
+            background: white;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        h3 {
+            color: #764ba2;
+            font-size: 1.4rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        h4 {
+            color: #667eea;
+            font-size: 1.15rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        p { margin-bottom: 1rem; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        table thead { background: #f8f9fa; }
+        table th, table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        table th { font-weight: 600; color: #667eea; }
+        table tbody tr:hover { background: #f5f5f5; }
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        code { font-family: 'Courier New', monospace; }
+        p code, li code {
+            background: #f0f0f0;
+            color: #c7254e;
+            padding: 0.1rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        .note {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ff9800;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .arch-diagram {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            white-space: pre;
+            overflow-x: auto;
+            line-height: 1.4;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+        .card h4 { margin-top: 0; }
+        .card p { font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .tag {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 0.15rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-right: 0.3rem;
+            margin-bottom: 0.3rem;
+        }
+        .tag-hot { background: #e53935; }
+        .tag-new { background: #43a047; }
+        .tag-stable { background: #1e88e5; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.4rem; }
+        footer {
+            background: #333;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="site-nav" aria-label="Main navigation" style="background:#1a1a2e;color:white;padding:0.65rem 1rem;text-align:center;font-size:0.88rem;position:sticky;top:0;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,0.25);">
+        <a href="index.html" style="color:#fff;text-decoration:none;margin:0 0.4rem;padding:0.3rem 0.6rem;border-radius:4px;">🏠 Home</a>
+        <span style="color:#555;">|</span>
+        <a href="model_selector.html" style="color:#fff;text-decoration:none;margin:0 0.4rem;padding:0.3rem 0.6rem;">🎯 Selector</a>
+        <a href="models_documentation.html" style="color:#fff;text-decoration:none;margin:0 0.4rem;padding:0.3rem 0.6rem;">📚 Docs</a>
+        <a href="models_deep_dive.html" style="color:#fff;text-decoration:none;margin:0 0.4rem;padding:0.3rem 0.6rem;">🔬 Deep Dive</a>
+        <a href="interactive_demos.html" style="color:#fff;text-decoration:none;margin:0 0.4rem;padding:0.3rem 0.6rem;">🎮 Demos</a>
+        <a href="training_guide.html" style="color:#fff;text-decoration:none;margin:0 0.4rem;padding:0.3rem 0.6rem;">🚀 Training</a>
+        <a href="advanced_topics.html" aria-current="page" style="color:#ffd700;text-decoration:none;margin:0 0.4rem;padding:0.3rem 0.6rem;background:rgba(255,215,0,0.15);border-radius:4px;">⚡ Advanced</a>
+    </nav>
+
+    <header>
+        <h1>Advanced Topics</h1>
+        <p>RAG, Agents, Tool Use, MCP, Reasoning Models, Deployment &amp; Safety</p>
+        <p style="font-size: 0.9rem; margin-top: 1rem;">The 2024-2026 stack: what matters beyond raw model selection</p>
+    </header>
+
+    <div class="container">
+        <nav class="page-nav">
+            <ul>
+                <li><a href="#rag">RAG</a></li>
+                <li><a href="#agents">Agents</a></li>
+                <li><a href="#tool-use">Tool Use</a></li>
+                <li><a href="#mcp">MCP</a></li>
+                <li><a href="#reasoning">Reasoning Models</a></li>
+                <li><a href="#structured-output">Structured Output</a></li>
+                <li><a href="#deployment">Deployment</a></li>
+                <li><a href="#evaluation">Evaluation</a></li>
+                <li><a href="#safety">Safety &amp; Guardrails</a></li>
+                <li><a href="#prompt-engineering">Prompt Engineering</a></li>
+            </ul>
+        </nav>
+
+        <section>
+            <h2>Why This Page Exists</h2>
+            <p>The base guides cover what models exist and how they work. This page covers what you <em>do</em> with them in 2026: ground them in your data (RAG), let them take actions (agents, tool use), run them in production (deployment), and verify they're doing the right thing (evaluation, safety).</p>
+            <p>Most production LLM failures are <strong>not</strong> "the model isn't smart enough." They're: retrieval missed the right chunk, the tool schema was ambiguous, no guardrail caught the hallucination, or the deployment stack couldn't handle concurrent users. This page is about those problems.</p>
+        </section>
+
+        <!-- RAG -->
+        <section id="rag">
+            <h2>1. Retrieval-Augmented Generation (RAG)</h2>
+
+            <p>RAG is the dominant pattern for grounding LLMs in private or domain-specific data. Instead of fine-tuning on your corpus (expensive, opaque, risks catastrophic forgetting), you retrieve relevant chunks at query time and inject them into the prompt.</p>
+
+            <h3>The Basic Pipeline</h3>
+            <div class="arch-diagram">┌──────────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐
+│ User query   │──▶│ Embed    │──▶│ Vector   │──▶│ Top-k    │
+│ "What is X?" │   │ (bge-*,  │   │ search   │   │ chunks   │
+└──────────────┘   │  e5, etc)│   │ (FAISS,  │   └──────────┘
+                   └──────────┘   │  pgvector│        │
+                                  │  Qdrant) │        ▼
+                                  └──────────┘   ┌──────────┐
+                                                 │ Prompt   │
+                                                 │ + context│
+                                                 └──────────┘
+                                                      │
+                                                      ▼
+                                                 ┌──────────┐
+                                                 │   LLM    │──▶ Answer
+                                                 └──────────┘</div>
+
+            <h3>Components & Current Best Practices (2026)</h3>
+
+            <h4>1. Chunking</h4>
+            <ul>
+                <li><strong>Fixed-size</strong> (256-1024 tokens) with 10-20% overlap — simple default</li>
+                <li><strong>Semantic/recursive</strong> chunking — splits on paragraph/section boundaries (LangChain <code>RecursiveCharacterTextSplitter</code>, Unstructured.io)</li>
+                <li><strong>Late chunking</strong> (jina-embeddings-v3) — embed long doc first, then chunk the token embeddings. Preserves context.</li>
+                <li><strong>Contextual retrieval</strong> (Anthropic, 2024) — prepend each chunk with an LLM-generated 1-line summary. Reduces retrieval failures 35-49%.</li>
+            </ul>
+
+            <h4>2. Embedding Models (ranked, 2026)</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Dim</th>
+                        <th>MTEB</th>
+                        <th>Best For</th>
+                        <th>License</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>BAAI/bge-large-en-v1.5</code> <span class="tag tag-stable">stable</span></td>
+                        <td>1024</td>
+                        <td>~64</td>
+                        <td>English, general-purpose default</td>
+                        <td>MIT</td>
+                    </tr>
+                    <tr>
+                        <td><code>BAAI/bge-m3</code> <span class="tag tag-stable">multilingual</span></td>
+                        <td>1024</td>
+                        <td>~66</td>
+                        <td>Multilingual + hybrid (dense+sparse+colbert)</td>
+                        <td>MIT</td>
+                    </tr>
+                    <tr>
+                        <td><code>intfloat/e5-mistral-7b-instruct</code></td>
+                        <td>4096</td>
+                        <td>~67</td>
+                        <td>Highest quality, expensive</td>
+                        <td>MIT</td>
+                    </tr>
+                    <tr>
+                        <td><code>nomic-ai/nomic-embed-text-v1.5</code></td>
+                        <td>64-768</td>
+                        <td>~62</td>
+                        <td>Matryoshka (variable dim), long context (8k)</td>
+                        <td>Apache 2.0</td>
+                    </tr>
+                    <tr>
+                        <td><code>jinaai/jina-embeddings-v3</code></td>
+                        <td>1024</td>
+                        <td>~65</td>
+                        <td>Late chunking, 8k context, task-specific LoRAs</td>
+                        <td>CC BY-NC</td>
+                    </tr>
+                    <tr>
+                        <td><code>Snowflake/snowflake-arctic-embed-l</code></td>
+                        <td>1024</td>
+                        <td>~63</td>
+                        <td>Enterprise search, Apache 2.0</td>
+                        <td>Apache 2.0</td>
+                    </tr>
+                    <tr>
+                        <td><code>colbert-ir/colbertv2.0</code></td>
+                        <td>128/tok</td>
+                        <td>—</td>
+                        <td>Late-interaction, best recall</td>
+                        <td>MIT</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning">
+                <strong>Migrating from <code>all-MiniLM-L6-v2</code>?</strong> It's 2021-era and still heavily used because of tiny size (80MB). For accuracy-sensitive applications, switch to <code>bge-large-en-v1.5</code> (1.3GB) — typically +5-8% on retrieval benchmarks.
+            </div>
+
+            <h4>3. Vector Stores</h4>
+            <table>
+                <thead>
+                    <tr><th>Store</th><th>When to Use</th><th>Scale</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>FAISS</strong></td><td>Single-machine, static corpus, fast</td><td>100M vectors</td></tr>
+                    <tr><td><strong>pgvector</strong></td><td>Already on Postgres, &lt; 10M vectors</td><td>10M vectors</td></tr>
+                    <tr><td><strong>Qdrant / Weaviate</strong></td><td>Production, filters + metadata, self-hosted</td><td>1B vectors</td></tr>
+                    <tr><td><strong>Milvus</strong></td><td>Large-scale, Kubernetes-native</td><td>10B vectors</td></tr>
+                    <tr><td><strong>Pinecone / Turbopuffer</strong></td><td>Managed, zero ops</td><td>Unlimited</td></tr>
+                    <tr><td><strong>LanceDB</strong></td><td>Embedded, analytics-friendly (Parquet)</td><td>100M vectors</td></tr>
+                </tbody>
+            </table>
+
+            <h4>4. Hybrid Retrieval (Critical for Production)</h4>
+            <p>Dense embeddings miss exact matches (SKU numbers, names, acronyms). Always combine:</p>
+            <ul>
+                <li><strong>Dense</strong> (semantic): bge-large / e5</li>
+                <li><strong>Sparse</strong> (keyword): BM25, SPLADE</li>
+                <li><strong>Fuse</strong> with Reciprocal Rank Fusion (RRF) or learned reranker</li>
+            </ul>
+
+            <h4>5. Reranking (the step most pipelines skip)</h4>
+            <p>Retrieve top-50, rerank with a cross-encoder, keep top-5. Reranker sees query and candidate <em>together</em>, gives much better ordering.</p>
+            <table>
+                <thead><tr><th>Reranker</th><th>Speed</th><th>Quality</th></tr></thead>
+                <tbody>
+                    <tr><td><code>BAAI/bge-reranker-v2-m3</code></td><td>Fast</td><td>Good, multilingual</td></tr>
+                    <tr><td><code>cross-encoder/ms-marco-MiniLM-L-12-v2</code></td><td>Very fast</td><td>Decent baseline</td></tr>
+                    <tr><td><strong>Cohere Rerank 3</strong></td><td>API</td><td>Best managed</td></tr>
+                    <tr><td><strong>Voyage rerank-2</strong></td><td>API</td><td>Strong</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Minimal RAG Example (Python)</h3>
+<pre><code>from sentence_transformers import SentenceTransformer, CrossEncoder
+from qdrant_client import QdrantClient
+from transformers import pipeline
+
+# 1. Embed corpus
+embedder = SentenceTransformer("BAAI/bge-large-en-v1.5")
+reranker = CrossEncoder("BAAI/bge-reranker-v2-m3")
+
+docs = [...]  # your chunks
+vectors = embedder.encode(docs, normalize_embeddings=True)
+
+# 2. Store
+client = QdrantClient(":memory:")
+client.upload_collection("kb", vectors=vectors, payload=[{"text": d} for d in docs])
+
+# 3. Query
+query = "What is RAG?"
+q_vec = embedder.encode(query, normalize_embeddings=True)
+hits = client.search("kb", q_vec, limit=50)
+
+# 4. Rerank
+pairs = [(query, h.payload["text"]) for h in hits]
+scores = reranker.predict(pairs)
+top_chunks = [h.payload["text"] for _, h in sorted(zip(scores, hits), reverse=True)[:5]]
+
+# 5. Generate
+llm = pipeline("text-generation", model="meta-llama/Llama-3.3-70B-Instruct")
+context = "\n\n".join(top_chunks)
+answer = llm(f"Context:\n{context}\n\nQuestion: {query}\nAnswer:")
+</code></pre>
+
+            <h3>RAG Frameworks</h3>
+            <ul>
+                <li><strong>LlamaIndex</strong> — data framework, rich loader/parser ecosystem, advanced retrieval strategies (auto-merging, sentence-window, etc.)</li>
+                <li><strong>LangChain</strong> — orchestration-heavy, popular, opinionated. Good for prototyping agents + RAG.</li>
+                <li><strong>Haystack</strong> — production-focused, pipeline DAGs, strong eval tooling</li>
+                <li><strong>DSPy</strong> (Stanford) — treats prompting + retrieval as optimizable programs; can compile prompts automatically</li>
+                <li><strong>RAGatouille</strong> — makes ColBERT easy to use</li>
+            </ul>
+
+            <h3>Common RAG Failure Modes</h3>
+            <div class="card-grid">
+                <div class="card"><h4>Retrieval misses</h4><p>Fix: hybrid search + reranking + better chunking.</p></div>
+                <div class="card"><h4>Lost in the middle</h4><p>Models attend weakly to mid-context. Fix: rerank to put best chunks at top/bottom.</p></div>
+                <div class="card"><h4>Irrelevant retrieval</h4><p>Top-k returns something even when nothing matches. Fix: threshold + "I don't know" prompt.</p></div>
+                <div class="card"><h4>Conflicting chunks</h4><p>Fix: deduplicate, use reranker to surface the most authoritative.</p></div>
+                <div class="card"><h4>Chunk ≠ useful unit</h4><p>Fix: include parent section header; use sentence-window retrieval.</p></div>
+                <div class="card"><h4>Stale index</h4><p>Re-embed periodically; invalidate on source change.</p></div>
+            </div>
+        </section>
+
+        <!-- AGENTS -->
+        <section id="agents">
+            <h2>2. Agents: LLMs That Take Actions</h2>
+
+            <p>An <strong>agent</strong> is an LLM wrapped in a loop that can call tools, observe results, and decide what to do next. The 2023 idea is now production-ready in 2026 thanks to better tool-use training (Llama 3+, Qwen2.5, Claude 3.5+, GPT-4+).</p>
+
+            <h3>Agent Architectures</h3>
+
+            <h4>ReAct (Reason + Act)</h4>
+            <p>The baseline pattern. Model alternates <em>Thought → Action → Observation → Thought...</em> until it has an answer.</p>
+            <div class="arch-diagram">Thought: I need the weather in Paris.
+Action: get_weather(city="Paris")
+Observation: 15°C, rainy
+Thought: I have enough to answer.
+Answer: It's 15°C and rainy in Paris.</div>
+
+            <h4>Plan-and-Execute</h4>
+            <p>Planner LLM writes a full plan first, executor runs steps. Better for complex tasks; worse for dynamic environments.</p>
+
+            <h4>Reflexion / Self-Refine</h4>
+            <p>Agent critiques its own output, tries again. Useful for code-gen, math, harder coding agents (SWE-agent, Cursor, Claude Code).</p>
+
+            <h4>Multi-agent</h4>
+            <p>Specialist agents (researcher, coder, reviewer) coordinate via messages. Frameworks: AutoGen, CrewAI, LangGraph. Useful in theory, expensive in practice — use only when single-agent has clearly failed.</p>
+
+            <h3>Frameworks</h3>
+            <table>
+                <thead><tr><th>Framework</th><th>Best For</th><th>Notes</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>LangGraph</strong> <span class="tag tag-hot">popular</span></td><td>Stateful graphs, production agents</td><td>From LangChain team; explicit state, checkpoints</td></tr>
+                    <tr><td><strong>AutoGen</strong> (Microsoft)</td><td>Multi-agent conversations</td><td>Rich conversation patterns</td></tr>
+                    <tr><td><strong>CrewAI</strong></td><td>Role-based teams</td><td>Simple mental model, less control</td></tr>
+                    <tr><td><strong>HF smolagents</strong> <span class="tag tag-new">new</span></td><td>Minimal code agents</td><td>Execute Python directly, ~1000 LoC</td></tr>
+                    <tr><td><strong>OpenAI Swarm / Agents SDK</strong></td><td>Handoffs between agents</td><td>Lightweight</td></tr>
+                    <tr><td><strong>Anthropic Claude Agent SDK</strong></td><td>Production Claude agents</td><td>Native tool use, MCP support</td></tr>
+                    <tr><td><strong>Pydantic AI</strong> <span class="tag tag-new">new</span></td><td>Type-safe agents</td><td>Validated I/O via Pydantic</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Agent Failure Modes</h3>
+            <ul>
+                <li><strong>Infinite loops</strong> — enforce max iterations (10-20 typical)</li>
+                <li><strong>Tool selection errors</strong> — happens ~5-15% even for GPT-4. Mitigation: clear tool descriptions, fewer tools, reflection step</li>
+                <li><strong>Hallucinated tool arguments</strong> — use structured output (JSON schema), validate before executing</li>
+                <li><strong>Context explosion</strong> — long trajectories blow past context window. Mitigation: summarize old steps, sub-agent delegation</li>
+                <li><strong>Cost explosion</strong> — one failed agent loop can cost $10-50 on commercial APIs. Set hard budgets and iteration caps.</li>
+            </ul>
+        </section>
+
+        <!-- TOOL USE -->
+        <section id="tool-use">
+            <h2>3. Tool Use &amp; Function Calling</h2>
+
+            <p>Tool use lets a model request execution of a function (get_weather, search_database, send_email) and incorporate the result into its response. Native support exists in all modern models (GPT-4+, Claude 3+, Llama 3.1+, Qwen2.5+, Mistral Large+, Gemini).</p>
+
+            <h3>Protocol (OpenAI/Anthropic format)</h3>
+<pre><code># 1. You describe tools as JSON schema
+tools = [{
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "Current weather for a city",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "city": {"type": "string"},
+                "unit": {"type": "string", "enum": ["C", "F"]}
+            },
+            "required": ["city"]
+        }
+    }
+}]
+
+# 2. Model returns either a text answer OR a tool call
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[{"role": "user", "content": "Weather in Tokyo?"}],
+    tools=tools,
+)
+
+# 3. You execute, return the result as a tool_response message, loop
+if response.choices[0].message.tool_calls:
+    for call in response.choices[0].message.tool_calls:
+        result = dispatch(call.function.name, json.loads(call.function.arguments))
+        messages.append({"role": "tool", "tool_call_id": call.id, "content": result})
+    response = client.chat.completions.create(model="gpt-4", messages=messages, tools=tools)
+</code></pre>
+
+            <h3>Best Practices</h3>
+            <ul>
+                <li><strong>Fewer, better tools</strong> &gt; many overlapping tools. 5-15 tools is the sweet spot for reliable selection.</li>
+                <li><strong>Descriptive names &amp; docstrings</strong> — the model picks based on these. <code>search_internal_kb</code> beats <code>search</code>.</li>
+                <li><strong>Validate arguments</strong> — Pydantic or jsonschema before executing. Models occasionally hallucinate field names.</li>
+                <li><strong>Idempotent tools</strong> when possible — retries are common.</li>
+                <li><strong>Error messages back to the model</strong> — return errors as tool output so it can retry. Don't throw.</li>
+                <li><strong>Parallel tool calls</strong> — GPT-4 and Claude 3.5+ can emit multiple calls per turn; batch execute.</li>
+            </ul>
+
+            <h3>Benchmark Context</h3>
+            <p>On the Berkeley Function-Calling Leaderboard (BFCL) as of early 2026:</p>
+            <ul>
+                <li>GPT-4, Claude 3.5+, Qwen2.5-72B: ~90%+ on simple tool calls</li>
+                <li>Llama 3.3 70B: ~88%</li>
+                <li>7B models: 75-85% — usable with good prompts but require validation</li>
+                <li>Multi-turn / parallel / nested scenarios drop every model 10-20 points</li>
+            </ul>
+        </section>
+
+        <!-- MCP -->
+        <section id="mcp">
+            <h2>4. Model Context Protocol (MCP)</h2>
+
+            <p><strong>MCP</strong> (introduced by Anthropic, late 2024) is an open standard for exposing tools, resources, and prompts to LLMs in a vendor-neutral way. Think of it as <em>"LSP for LLM tools"</em> — write a server once, any MCP-compatible client can use it.</p>
+
+            <h3>Core Concepts</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <h4>Tools</h4>
+                    <p>Functions the LLM can invoke (same as function calling). Defined with JSON schema.</p>
+                </div>
+                <div class="card">
+                    <h4>Resources</h4>
+                    <p>Read-only data the LLM can reference (files, DB rows, API responses). Identified by URIs.</p>
+                </div>
+                <div class="card">
+                    <h4>Prompts</h4>
+                    <p>Server-defined prompt templates users can invoke ("/summarize", "/code-review").</p>
+                </div>
+                <div class="card">
+                    <h4>Transports</h4>
+                    <p>stdio (local process), Streamable HTTP (remote). JSON-RPC 2.0 underneath.</p>
+                </div>
+            </div>
+
+            <h3>Why It Matters</h3>
+            <ul>
+                <li><strong>Write once, run everywhere</strong> — an MCP server for GitHub works with Claude Desktop, Cursor, Zed, Windsurf, custom apps, etc.</li>
+                <li><strong>Separates tool concerns</strong> — tool authors and app authors don't need to integrate pairwise</li>
+                <li><strong>Ecosystem momentum</strong> — OpenAI, Google, Microsoft all announced MCP support in 2025</li>
+            </ul>
+
+            <h3>Minimal MCP Server (Python)</h3>
+<pre><code>from mcp.server.fastmcp import FastMCP
+
+app = FastMCP("weather-server")
+
+@app.tool()
+def get_weather(city: str, unit: str = "C") -> dict:
+    """Get current weather for a city."""
+    # ... your implementation
+    return {"city": city, "temp": 15, "unit": unit, "conditions": "rainy"}
+
+@app.resource("weather://cities")
+def list_cities() -> str:
+    """List supported cities."""
+    return "Paris, Tokyo, New York, London"
+
+if __name__ == "__main__":
+    app.run()  # stdio transport by default
+</code></pre>
+
+            <h3>When to Use MCP vs. Direct Tool Calls</h3>
+            <table>
+                <thead><tr><th>Use MCP</th><th>Use Direct Tool Calls</th></tr></thead>
+                <tbody>
+                    <tr><td>Tools reused across apps/clients</td><td>Single app, tightly coupled</td></tr>
+                    <tr><td>Want plug-and-play for end users</td><td>Internal SaaS, no client flexibility</td></tr>
+                    <tr><td>Building a tool for the ecosystem</td><td>One-off internal agent</td></tr>
+                    <tr><td>Need resources + prompts, not just tools</td><td>Pure function calling suffices</td></tr>
+                </tbody>
+            </table>
+
+            <div class="note">
+                <strong>Ecosystem:</strong> browse <code>modelcontextprotocol.io/servers</code> for hundreds of community servers: databases, APIs, filesystems, browsers, Git, Slack, Jira, etc. Anthropic publishes reference servers in TypeScript and Python.
+            </div>
+        </section>
+
+        <!-- REASONING -->
+        <section id="reasoning">
+            <h2>5. Reasoning Models &amp; Test-Time Compute</h2>
+
+            <p>The biggest shift of 2024-2026: models that <strong>think before answering</strong>. OpenAI's o1 (Sept 2024), DeepSeek-R1 (Jan 2025), and subsequent waves changed the frontier. These models generate a long hidden/visible chain-of-thought ("thinking"), then produce a concise answer.</p>
+
+            <h3>Key Insight: Scale Test-Time Compute, Not Just Training Compute</h3>
+            <p>Pre-2024: quality ≈ model size × training data. Post-o1: quality ≈ model size × training × <em>inference-time thinking length</em>. A 70B reasoning model can match a 400B non-reasoning model on math/code if you let it think.</p>
+
+            <h3>Representative Models (2026)</h3>
+            <table>
+                <thead>
+                    <tr><th>Model</th><th>Type</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>OpenAI o1 / o3 / o3-mini</strong></td><td>Closed</td><td>Hidden CoT, priced by "reasoning tokens"</td></tr>
+                    <tr><td><strong>Claude 3.7/Opus extended thinking</strong></td><td>Closed</td><td>Visible thinking traces, toggleable</td></tr>
+                    <tr><td><strong>DeepSeek-R1 / R1-Zero</strong> <span class="tag tag-hot">open</span></td><td>Open MIT</td><td>Trained with pure RL (GRPO). Thinking in &lt;think&gt; tags.</td></tr>
+                    <tr><td><strong>DeepSeek-R1-Distill-Qwen-{7B,14B,32B}</strong></td><td>Open</td><td>Smaller models distilled from R1 — punches above weight class</td></tr>
+                    <tr><td><strong>QwQ-32B</strong> (Qwen)</td><td>Open Apache</td><td>Strong open reasoner, 32B</td></tr>
+                    <tr><td><strong>Qwen3 &amp; Qwen3-Thinking</strong></td><td>Open</td><td>Toggleable reasoning mode</td></tr>
+                    <tr><td><strong>Gemini 2.5 Thinking</strong></td><td>Closed</td><td>Google's reasoning tier</td></tr>
+                </tbody>
+            </table>
+
+            <h3>How They're Trained (GRPO &amp; Variants)</h3>
+            <p>DeepSeek-R1-Zero demonstrated that <strong>pure RL, no supervised CoT data</strong>, can teach reasoning from scratch. The key algorithm:</p>
+            <ul>
+                <li><strong>GRPO (Group Relative Policy Optimization)</strong> — variant of PPO that samples a group of completions per prompt, computes relative rewards within the group, uses that as advantage. Cheap (no value model), effective for verifiable-reward tasks (math, code).</li>
+                <li>Reward functions: rule-based (correct answer? compiles? passes tests?) — not learned reward models, avoids reward hacking.</li>
+                <li>Emergent behavior: the model <em>learns to backtrack, self-check, allocate more thinking to harder problems</em> — purely from reward signal.</li>
+            </ul>
+
+            <h3>Inference-Time Techniques</h3>
+            <ul>
+                <li><strong>Chain-of-Thought prompting</strong> — "Let's think step by step." (Works for non-reasoning models too)</li>
+                <li><strong>Self-consistency</strong> — sample N solutions, majority-vote the answer</li>
+                <li><strong>Tree-of-Thought</strong> — branch and evaluate partial reasoning paths</li>
+                <li><strong>Best-of-N with verifier</strong> — sample N, score each with a reward/verifier model, pick best</li>
+                <li><strong>Budget forcing</strong> (s1 paper, 2025) — force model to think longer by suppressing &lt;/think&gt; token</li>
+            </ul>
+
+            <h3>When NOT to Use a Reasoning Model</h3>
+            <ul>
+                <li>Simple chat — reasoning is overhead (5-50x more tokens)</li>
+                <li>Latency-critical UX — thinking can take 10-60s</li>
+                <li>Cost-sensitive high-volume — reasoning tokens cost the same as regular output</li>
+                <li>Tasks that don't benefit: summarization, translation, casual Q&A</li>
+            </ul>
+
+            <div class="success">
+                <strong>Rule of thumb:</strong> Use reasoning models for math, code with complex logic, multi-step planning, graduate-level science (GPQA). Use regular models for everything else.
+            </div>
+        </section>
+
+        <!-- STRUCTURED OUTPUT -->
+        <section id="structured-output">
+            <h2>6. Structured Output &amp; Constrained Decoding</h2>
+
+            <p>Getting an LLM to output valid JSON (or any other format) reliably is a solved problem in 2026. Three approaches, increasing reliability:</p>
+
+            <h3>Approach 1: Prompt and Hope</h3>
+            <p>"Respond in JSON with fields X, Y, Z." Works 90%+ on modern models but the 5-10% failure rate kills production pipelines.</p>
+
+            <h3>Approach 2: Native Structured Output APIs</h3>
+            <ul>
+                <li><strong>OpenAI Structured Outputs</strong> — pass a JSON schema, get guaranteed valid JSON (100%)</li>
+                <li><strong>Anthropic tool use</strong> — tool arguments are schema-constrained</li>
+                <li><strong>Gemini response_schema</strong></li>
+            </ul>
+
+            <h3>Approach 3: Constrained Decoding (local models)</h3>
+            <p>Mask out invalid tokens at each step. Guaranteed valid output, often faster than unconstrained because many tokens are "forced."</p>
+            <table>
+                <thead><tr><th>Library</th><th>Stack</th><th>Notes</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Outlines</strong></td><td>transformers, vLLM, exllama</td><td>Regex + JSON Schema + Pydantic + CFG. Popular.</td></tr>
+                    <tr><td><strong>XGrammar</strong></td><td>vLLM, SGLang</td><td>Fast CFG-based, near-zero overhead</td></tr>
+                    <tr><td><strong>LM-Format-Enforcer</strong></td><td>transformers, vLLM</td><td>JSON, regex</td></tr>
+                    <tr><td><strong>Guidance</strong> (Microsoft)</td><td>many backends</td><td>Template-language, interleave generation + logic</td></tr>
+                    <tr><td><strong>Instructor</strong></td><td>OpenAI/Anthropic-style APIs</td><td>Pydantic models → validated outputs, retries</td></tr>
+                </tbody>
+            </table>
+
+<pre><code># Example: Outlines with JSON schema
+from outlines import models, generate
+from pydantic import BaseModel
+
+class Person(BaseModel):
+    name: str
+    age: int
+    email: str
+
+model = models.transformers("meta-llama/Llama-3.3-70B-Instruct")
+generator = generate.json(model, Person)
+person = generator("Extract: John Doe, 30, john@example.com")
+# person is a validated Person instance, guaranteed.
+</code></pre>
+        </section>
+
+        <!-- DEPLOYMENT -->
+        <section id="deployment">
+            <h2>7. Deployment &amp; Serving</h2>
+
+            <p>A fine-tuned model in your local notebook is not a deployed model. Here's the 2026 serving stack:</p>
+
+            <h3>Inference Servers (self-hosted)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Server</th>
+                        <th>Stack</th>
+                        <th>Strengths</th>
+                        <th>When to Use</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>vLLM</strong> <span class="tag tag-hot">dominant</span></td>
+                        <td>PyTorch, CUDA/ROCm</td>
+                        <td>PagedAttention, continuous batching, fastest for most workloads</td>
+                        <td>Default choice for GPU serving</td>
+                    </tr>
+                    <tr>
+                        <td><strong>TGI</strong> (HF Text Generation Inference)</td>
+                        <td>Rust + PyTorch</td>
+                        <td>Production-hardened, Flash Attention, quantization</td>
+                        <td>HF ecosystem, Inference Endpoints</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SGLang</strong> <span class="tag tag-new">rising</span></td>
+                        <td>PyTorch</td>
+                        <td>RadixAttention (KV cache sharing), structured output, competitive with vLLM</td>
+                        <td>Complex prompts, structured output at scale</td>
+                    </tr>
+                    <tr>
+                        <td><strong>TensorRT-LLM</strong> (NVIDIA)</td>
+                        <td>TensorRT</td>
+                        <td>Fastest on NVIDIA, but compile step is painful</td>
+                        <td>Dedicated NVIDIA deployments, latency-critical</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LMDeploy</strong></td>
+                        <td>PyTorch</td>
+                        <td>TurboMind engine, strong on A100/H100</td>
+                        <td>Chinese cloud (Qwen-heavy)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ollama</strong></td>
+                        <td>llama.cpp wrapper</td>
+                        <td>Dead-simple CLI, model library, API</td>
+                        <td>Local dev, Mac laptops</td>
+                    </tr>
+                    <tr>
+                        <td><strong>llama.cpp</strong></td>
+                        <td>C++, CPU/GPU/Metal</td>
+                        <td>Runs on anything, GGUF quantization</td>
+                        <td>CPU-only, embedded, edge, Mac</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MLX</strong> (Apple)</td>
+                        <td>Apple Silicon</td>
+                        <td>Unified memory, fastest on M-series</td>
+                        <td>Mac production (rare), Mac dev</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Managed / Hosted</h3>
+            <ul>
+                <li><strong>HF Inference Endpoints</strong> — one-click deploy any Hub model. Autoscale, dedicated GPU. $0.06-$8/hr.</li>
+                <li><strong>HF Inference API (Serverless)</strong> — free tier for testing, rate-limited</li>
+                <li><strong>Replicate, Together, Anyscale, Fireworks, Groq</strong> — API providers for open models. Groq specializes in low-latency via LPUs (~500 tok/s on Llama 3).</li>
+                <li><strong>AWS Bedrock, Azure AI, GCP Vertex</strong> — enterprise, compliance-friendly, both closed and open models</li>
+                <li><strong>Modal, RunPod, Lambda Labs</strong> — rent-a-GPU, bring your own server</li>
+            </ul>
+
+            <h3>Critical Optimizations</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <h4>Continuous Batching</h4>
+                    <p>Don't wait for batch to fill. Stream new requests into running batch. 10-20x throughput.</p>
+                </div>
+                <div class="card">
+                    <h4>PagedAttention</h4>
+                    <p>KV cache as pages, not contiguous. Near-zero fragmentation. Core to vLLM.</p>
+                </div>
+                <div class="card">
+                    <h4>Prefix Caching</h4>
+                    <p>Cache KV for shared prompt prefixes (system prompts, few-shot). 5-10x speedup for chat.</p>
+                </div>
+                <div class="card">
+                    <h4>Speculative Decoding</h4>
+                    <p>Draft model proposes N tokens, big model verifies in one pass. 2-3x latency win.</p>
+                </div>
+                <div class="card">
+                    <h4>Quantization at Serve Time</h4>
+                    <p>AWQ/GPTQ 4-bit, FP8 (H100+). 4x memory, minor quality hit.</p>
+                </div>
+                <div class="card">
+                    <h4>Tensor / Pipeline Parallelism</h4>
+                    <p>Shard model across GPUs. Needed for 70B+ on anything smaller than 80GB cards.</p>
+                </div>
+            </div>
+
+            <h3>Deploying a Fine-Tuned Model: End-to-End</h3>
+<pre><code># 1. After LoRA fine-tuning, merge adapter into base
+from peft import PeftModel
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+base = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.1-8B-Instruct")
+model = PeftModel.from_pretrained(base, "./my-lora-output")
+merged = model.merge_and_unload()
+merged.save_pretrained("./my-model-merged")
+
+# 2. Push to Hub
+merged.push_to_hub("myuser/llama-3.1-8b-custom")
+
+# 3. (Optional) Quantize to GGUF for llama.cpp/Ollama
+# $ python llama.cpp/convert.py ./my-model-merged
+# $ llama.cpp/quantize ./my-model.gguf q4_k_m
+
+# 4. Serve with vLLM
+# $ vllm serve myuser/llama-3.1-8b-custom --tensor-parallel-size 2
+
+# 5. Or deploy to HF Inference Endpoints (web UI)
+</code></pre>
+
+            <h3>Cost / Throughput Reference (April 2026, indicative)</h3>
+            <table>
+                <thead><tr><th>Setup</th><th>Throughput (tok/s)</th><th>Cost</th></tr></thead>
+                <tbody>
+                    <tr><td>Llama 3.3 70B @ FP16 on 2xH100 via vLLM</td><td>~500 batched</td><td>~$5/hr</td></tr>
+                    <tr><td>Llama 3.3 70B AWQ 4-bit on 1xA100 80GB</td><td>~200 batched</td><td>~$1.5/hr</td></tr>
+                    <tr><td>Llama 3.1 8B on 1xA10G</td><td>~1200 batched</td><td>~$1/hr</td></tr>
+                    <tr><td>Groq Llama 3 70B (managed LPU)</td><td>~300 per request</td><td>~$0.59/1M tok</td></tr>
+                    <tr><td>GPT-4 Turbo (API)</td><td>~60 per request</td><td>~$10-30/1M tok</td></tr>
+                    <tr><td>Claude 3.5 Sonnet (API)</td><td>~80 per request</td><td>~$3-15/1M tok</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- EVALUATION -->
+        <section id="evaluation">
+            <h2>8. Evaluation: Did My Model/Pipeline Actually Work?</h2>
+
+            <p>If you can't measure it, you're not engineering it. Evaluation is the gap that separates demos from production LLM systems.</p>
+
+            <h3>Three Evaluation Layers</h3>
+
+            <h4>1. Static benchmarks (model-level)</h4>
+            <ul>
+                <li><strong>MMLU / MMLU-Pro</strong> — knowledge and reasoning across subjects</li>
+                <li><strong>GPQA (Diamond)</strong> — graduate-level science, hard</li>
+                <li><strong>HumanEval / LiveCodeBench / SWE-Bench Verified</strong> — code</li>
+                <li><strong>MATH / AIME</strong> — math reasoning</li>
+                <li><strong>IFEval</strong> — instruction following</li>
+                <li><strong>MT-Bench / AlpacaEval 2 / Arena-Hard</strong> — chat preferences</li>
+                <li><strong>Chatbot Arena (LMSYS)</strong> — crowd-sourced Elo ratings; the most trusted single metric for general-purpose quality</li>
+                <li><strong>BFCL</strong> — function/tool calling</li>
+            </ul>
+            <p>Tooling: <code>lm-evaluation-harness</code> (EleutherAI), <code>lighteval</code> (HF), <code>HELM</code> (Stanford).</p>
+
+            <h4>2. Task / application benchmarks (pipeline-level)</h4>
+            <p>Static benchmarks don't tell you if <em>your</em> RAG pipeline works on <em>your</em> docs. Build your own.</p>
+            <ul>
+                <li>Curate 50-500 representative queries with gold answers</li>
+                <li>Run your full pipeline, score with:
+                    <ul>
+                        <li><strong>Exact match / F1</strong> — for extraction/classification</li>
+                        <li><strong>ROUGE / BLEU</strong> — summarization (weak but cheap)</li>
+                        <li><strong>Retrieval metrics</strong>: Recall@k, MRR, nDCG — for RAG</li>
+                        <li><strong>LLM-as-judge</strong> — GPT-4 or Claude scores your output against a rubric</li>
+                    </ul>
+                </li>
+                <li>Track over time; regress before shipping.</li>
+            </ul>
+
+            <h4>3. Production monitoring (live)</h4>
+            <ul>
+                <li>Response latency (p50, p95, p99)</li>
+                <li>Token usage (cost)</li>
+                <li>User feedback (thumbs up/down, implicit signals)</li>
+                <li>Hallucination detection (fact-check against retrieved context)</li>
+                <li>Safety classifier alerts (guardrail trips)</li>
+            </ul>
+            <p>Platforms: <strong>Langfuse</strong> (OSS, popular), <strong>Arize Phoenix</strong> (OSS), <strong>Braintrust</strong>, <strong>Weights &amp; Biases Weave</strong>, <strong>LangSmith</strong>.</p>
+
+            <h3>LLM-as-Judge Pattern</h3>
+<pre><code>judge_prompt = """Rate the answer on a 1-5 scale.
+
+Question: {q}
+Reference answer: {ref}
+Candidate answer: {cand}
+
+Criteria:
+- Factual correctness
+- Completeness
+- Uses only info from reference
+
+Output JSON: {{"score": int, "reasoning": str}}
+"""
+# Use a strong model (GPT-4, Claude 3.5) as judge
+# Validate with human labels on a calibration set (~50 examples)
+# Check inter-rater reliability with the human
+</code></pre>
+
+            <h3>Evaluation Tooling Matrix</h3>
+            <table>
+                <thead><tr><th>Tool</th><th>Layer</th><th>Best For</th></tr></thead>
+                <tbody>
+                    <tr><td>lm-evaluation-harness</td><td>Model</td><td>Standard academic benchmarks</td></tr>
+                    <tr><td>lighteval (HF)</td><td>Model</td><td>Modern HF-native, used for Open LLM Leaderboard</td></tr>
+                    <tr><td>RAGAS</td><td>Pipeline</td><td>RAG-specific metrics (faithfulness, answer relevance, context precision)</td></tr>
+                    <tr><td>DeepEval</td><td>Pipeline</td><td>Pytest-style LLM tests</td></tr>
+                    <tr><td>promptfoo</td><td>Pipeline</td><td>Prompt A/B testing, YAML config</td></tr>
+                    <tr><td>Langfuse / LangSmith</td><td>Production</td><td>Tracing, analytics, datasets</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- SAFETY -->
+        <section id="safety">
+            <h2>9. Safety, Guardrails &amp; Alignment</h2>
+
+            <p>Your model will occasionally: hallucinate, be jailbroken, leak PII, reproduce bias, produce unsafe content. Guardrails don't solve these — they catch and mitigate.</p>
+
+            <h3>Threat Model</h3>
+            <ul>
+                <li><strong>Prompt injection</strong> — user input overrides system instructions. Especially dangerous in agentic/tool-using systems.</li>
+                <li><strong>Jailbreaks</strong> — getting the model to violate its alignment (DAN, many-shot, encoded prompts)</li>
+                <li><strong>Hallucination</strong> — confident wrong answers</li>
+                <li><strong>Data leakage</strong> — model regurgitates training data or context (PII, trade secrets)</li>
+                <li><strong>Unsafe content</strong> — harmful, illegal, explicit</li>
+                <li><strong>Bias / fairness</strong> — disparate performance or offensive output across groups</li>
+            </ul>
+
+            <h3>Guardrail Models (stackable)</h3>
+            <table>
+                <thead><tr><th>Model</th><th>What It Does</th></tr></thead>
+                <tbody>
+                    <tr><td><code>meta-llama/Llama-Guard-3-8B</code></td><td>Classifies prompt/response for 14 harm categories</td></tr>
+                    <tr><td><code>google/shieldgemma-2b/9b/27b</code></td><td>Safety classifier, 4 harm categories, multiple sizes</td></tr>
+                    <tr><td><code>ibm-granite/granite-guardian-3.0-8b</code></td><td>Harm + hallucination + jailbreak + social bias</td></tr>
+                    <tr><td><code>protectai/deberta-v3-base-prompt-injection</code></td><td>Prompt injection classifier</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Frameworks</h3>
+            <ul>
+                <li><strong>NVIDIA NeMo Guardrails</strong> — programmable rails via Colang DSL. Input / dialog / output / retrieval / execution rails.</li>
+                <li><strong>Guardrails AI</strong> — "validators" for structure, PII, toxicity, competitors, etc.</li>
+                <li><strong>LLM Guard</strong> — input/output scanners (prompt injection, bias, PII, secrets, toxicity)</li>
+            </ul>
+
+            <h3>Typical Production Stack</h3>
+            <div class="arch-diagram">User input
+    │
+    ▼
+┌────────────────────────┐
+│ Input guardrails       │ ── Llama Guard 3, prompt-injection classifier
+│ - topic allow-list     │
+│ - PII redaction        │
+└────────────────────────┘
+    │
+    ▼
+┌────────────────────────┐
+│ LLM + RAG + Tools      │
+└────────────────────────┘
+    │
+    ▼
+┌────────────────────────┐
+│ Output guardrails      │ ── Llama Guard 3, PII scan, hallucination check
+│ - fact grounding       │    (answer in retrieved context?)
+│ - safety classification│
+│ - JSON schema validate │
+└────────────────────────┘
+    │
+    ▼
+Response to user (or refusal)</div>
+
+            <h3>Hallucination Mitigation Checklist</h3>
+            <ul>
+                <li>Ground in retrieved context (RAG) and prompt "Only answer from the context"</li>
+                <li>Instruct to cite sources; reject answers without citations</li>
+                <li>Post-hoc fact-checking: NLI model checks each claim against context</li>
+                <li>Lower temperature for factual tasks (0.0-0.3)</li>
+                <li>Use a reasoning model for complex chains</li>
+                <li>Calibrate via "I don't know" examples in prompts/fine-tuning data</li>
+            </ul>
+        </section>
+
+        <!-- PROMPT ENG -->
+        <section id="prompt-engineering">
+            <h2>10. Prompt Engineering (What Still Matters in 2026)</h2>
+
+            <p>Modern models are less brittle to prompt wording than 2023 models — but prompt engineering still delivers the biggest wins per hour invested. The techniques that consistently work:</p>
+
+            <h3>High-Leverage Techniques</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <h4>System message + role clarity</h4>
+                    <p>Dedicated system message. "You are a [role]. Your job is [goal]. Constraints: [rules]."</p>
+                </div>
+                <div class="card">
+                    <h4>Few-shot with diverse examples</h4>
+                    <p>2-5 examples covering edge cases. Huge impact on format and tone.</p>
+                </div>
+                <div class="card">
+                    <h4>XML / Markdown structure</h4>
+                    <p>Claude loves <code>&lt;context&gt;...&lt;/context&gt;</code>. GPT likes markdown headings. Use what the model was trained on.</p>
+                </div>
+                <div class="card">
+                    <h4>Chain of Thought</h4>
+                    <p>"Think step by step before answering." Still works even on reasoning models (redundant for o1/R1).</p>
+                </div>
+                <div class="card">
+                    <h4>Output format specification</h4>
+                    <p>Exact JSON schema or response template. Combine with structured output APIs.</p>
+                </div>
+                <div class="card">
+                    <h4>Explicit negative constraints</h4>
+                    <p>"Do NOT invent facts not in the context." "Do NOT answer if unsure."</p>
+                </div>
+                <div class="card">
+                    <h4>Context ordering</h4>
+                    <p>Most important info at start or end (lost-in-middle problem).</p>
+                </div>
+                <div class="card">
+                    <h4>Anchor with a concrete example</h4>
+                    <p>Instead of abstract rules: show one full input → output pair.</p>
+                </div>
+            </div>
+
+            <h3>Model-Family Quirks</h3>
+            <ul>
+                <li><strong>Claude</strong> — strong system prompts, loves XML tags, use "Assistant:" prefill to shape output</li>
+                <li><strong>GPT-4</strong> — responds well to markdown, detailed multi-section system prompts</li>
+                <li><strong>Llama</strong> — respect the chat template exactly (system/user/assistant tokens); tokenizer mismatches kill output quality</li>
+                <li><strong>Qwen</strong> — bilingual prompts OK; strong at JSON</li>
+                <li><strong>Reasoning models (o1/R1)</strong> — less prompt engineering needed, especially no need for "think step by step"; simpler prompts often better</li>
+            </ul>
+
+            <h3>Tools</h3>
+            <ul>
+                <li><strong>DSPy</strong> — compile prompts automatically from examples; treats prompting as program optimization</li>
+                <li><strong>promptfoo</strong> — eval prompt variants systematically</li>
+                <li><strong>LangSmith / Langfuse</strong> — version prompts, A/B test in production</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Where to Go Next</h2>
+            <ul>
+                <li>Start building: pick RAG or agents, use the minimal code above as a scaffold</li>
+                <li>Review the <a href="training_guide.html">training guide</a> for fine-tuning a reasoning or tool-use model</li>
+                <li>Check the <a href="models_deep_dive.html">deep dive</a> for the architecture innovations that enable these capabilities</li>
+                <li>Use the <a href="model_selector.html">selector</a> to pick models for any of these pipelines</li>
+            </ul>
+        </section>
+    </div>
+
+    <footer>
+        <p><strong>Advanced Topics - Hugging Face Models Guide</strong></p>
+        <p>April 2026 | RAG, Agents, MCP, Reasoning, Deployment, Evaluation, Safety</p>
+        <p><a href="index.html" style="color: #bbb;">← Back to Home</a></p>
+    </footer>
+</body>
+</html>

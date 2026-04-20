@@ -128,8 +128,13 @@
         input:focus,
         textarea:focus,
         select:focus {
-            outline: none;
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
             border-color: #667eea;
+        }
+        a:focus-visible, button:focus-visible {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
         }
         .button-group {
             display: flex;
@@ -302,9 +307,22 @@
     </style>
 </head>
 <body>
+    <nav class="site-nav" aria-label="Main navigation" style="background:#1a1a2e;color:white;padding:0.65rem 1rem;text-align:center;font-size:0.88rem;position:sticky;top:0;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,0.25);">
+        <a href="index.html" style="color:#fff;text-decoration:none;margin:0 0.4rem;padding:0.3rem 0.6rem;border-radius:4px;">🏠 Home</a>
+        <span style="color:#555;">|</span>
+        <a href="model_selector.html" style="color:#fff;text-decoration:none;margin:0 0.4rem;padding:0.3rem 0.6rem;">🎯 Selector</a>
+        <a href="models_documentation.html" style="color:#fff;text-decoration:none;margin:0 0.4rem;padding:0.3rem 0.6rem;">📚 Docs</a>
+        <a href="models_deep_dive.html" style="color:#fff;text-decoration:none;margin:0 0.4rem;padding:0.3rem 0.6rem;">🔬 Deep Dive</a>
+        <a href="interactive_demos.html" aria-current="page" style="color:#ffd700;text-decoration:none;margin:0 0.4rem;padding:0.3rem 0.6rem;background:rgba(255,215,0,0.15);border-radius:4px;">🎮 Demos</a>
+        <a href="training_guide.html" style="color:#fff;text-decoration:none;margin:0 0.4rem;padding:0.3rem 0.6rem;">🚀 Training</a>
+        <a href="advanced_topics.html" style="color:#fff;text-decoration:none;margin:0 0.4rem;padding:0.3rem 0.6rem;">⚡ Advanced</a>
+    </nav>
     <header>
         <h1>🎮 Hugging Face Models - Interactive Demos</h1>
         <p>Try different models and parameters in real-time</p>
+        <div role="note" style="background:#ff9800;color:white;padding:0.75rem 1rem;border-radius:6px;margin-top:1rem;font-size:0.9rem;max-width:800px;margin-left:auto;margin-right:auto;">
+            <strong>⚠️ Note:</strong> These demos run simulations client-side for illustrative purposes. For real model inference, use Hugging Face Inference API, <code>transformers.js</code>, or run models locally.
+        </div>
     </header>
 
     <div class="container">
@@ -385,7 +403,7 @@
                     <button class="btn-secondary" onclick="resetGeneration()">Reset</button>
                 </div>
 
-                <div class="output-section" id="genOutput">
+                <div class="output-section" id="genOutput" aria-live="polite" aria-atomic="true">
                     <div class="output-title">📝 Generated Output:</div>
                     <div class="output-content" id="genContent"></div>
                     <div style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
@@ -448,7 +466,7 @@
                     <button class="btn-primary" onclick="computeSimilarity()">Compute Similarity</button>
                 </div>
 
-                <div class="output-section" id="similarityOutput">
+                <div class="output-section" id="similarityOutput" aria-live="polite" aria-atomic="true">
                     <div class="output-title">📊 Similarity Result:</div>
                     <div id="similarityContent" style="padding: 1rem;">
                         <div style="margin-bottom: 1rem;">
@@ -549,7 +567,7 @@
                     <button class="btn-primary" onclick="classifyText()">Classify</button>
                 </div>
 
-                <div class="output-section" id="classifyOutput">
+                <div class="output-section" id="classifyOutput" aria-live="polite" aria-atomic="true">
                     <div class="output-title">🏷️ Classification Results:</div>
                     <div id="classifyContent"></div>
                 </div>
@@ -583,7 +601,7 @@
                     <button class="btn-primary" onclick="demonstrateTemperature()">Show Temperature Effect</button>
                 </div>
 
-                <div class="output-section" id="tuningOutput">
+                <div class="output-section" id="tuningOutput" aria-live="polite" aria-atomic="true">
                     <div class="output-title">🎚️ Temperature Comparison:</div>
                     <div style="padding: 1rem;">
                         <div style="margin-bottom: 1.5rem;">
@@ -667,7 +685,7 @@
                     <button class="btn-primary" onclick="demonstrateQuantization()">Compare Quantizations</button>
                 </div>
 
-                <div class="output-section" id="quantOutput">
+                <div class="output-section" id="quantOutput" aria-live="polite" aria-atomic="true">
                     <div class="output-title">⚙️ Quantization Comparison:</div>
                     <table class="comparison-table">
                         <thead>
